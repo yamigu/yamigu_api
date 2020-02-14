@@ -1,0 +1,13 @@
+{
+    "folders": [
+		{
+			"path": "C:\\Workspace\\react-native\\yamigu_api"
+		},
+		{
+			"path": "C:\\Workspace\\react-native\\venv"
+		}
+	],
+    "settings": {
+        "prettier.tabWidth": 4
+    }
+}
