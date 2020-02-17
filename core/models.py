@@ -22,9 +22,12 @@ class Shield(models.Model):
 
 
 class MatchRequest(models.Model):
+    STATUS_CODE_MATCHING = 1
+    STATUS_CODE_MATCHED = 2
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='match_request')
-    requested_on = models.DateTimeField()
+    requested_on = models.DateTimeField(auto_now_add=True, blank=True)
+    matched_on = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0)
 
 
