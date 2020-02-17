@@ -37,6 +37,19 @@ class UserInfoView(APIView):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
+class SignupView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        user.nickname = request.data['nickname']
+        user.is_student = True if request.data['is_student'] == 'true' else False
+        user.bv.belong = request.data['belong']
+        user.bv.department = request.data['department']
+        user.bv.save()
+        user.save()
+
+        return Response(status=status.HTTP_201_CREATED, data='successfully created')
+
+
 class ProfileImageView(APIView):
     def get(self, request, *args, **kwargs):
         #user = request.user

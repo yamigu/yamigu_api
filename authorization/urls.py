@@ -9,4 +9,5 @@ urlpatterns = [
 
     path('user/info/', UserInfoView.as_view()),
     path('user/profile/', ProfileImageView.as_view()),
+    path('user/signup/', SignupView.as_view()),
 ]

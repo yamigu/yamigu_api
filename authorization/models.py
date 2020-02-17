@@ -84,6 +84,8 @@ class BVImage(models.Model):
         BelongVerification, on_delete=models.CASCADE, related_name='image')
     data = models.OneToOneField(
         Image, on_delete=models.CASCADE, related_name='bv')
+    is_checked = models.BooleanField(default=False)
+    checked_on = models.DateTimeField(blank=True, null=True)
 
 
 class IdentityVerification(models.Model):
