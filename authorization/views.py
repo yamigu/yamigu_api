@@ -44,7 +44,7 @@ class ProfileImageView(APIView):
         data = []
         images = user.image.all()
         for image in images:
-            data.append(image.data.src)
+            data.append({'src': image.data.src, 'is_main': image.is_main})
         return Response(status=status.HTTP_200_OK, data=data)
 
 
