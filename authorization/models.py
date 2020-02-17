@@ -55,6 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     num_of_yami = models.IntegerField(default=0)
+    num_of_free = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     token = Token
     firebase_token = models.CharField(max_length=1000, null=True, unique=True)
@@ -66,26 +67,28 @@ class User(AbstractBaseUser, PermissionsMixin):
 class ProfileImage(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='image')
-    image = models.ForeignKey(
+    data = models.OneToOneField(
         Image, on_delete=models.CASCADE, related_name='profile')
     is_main = models.BooleanField(default=False)
 
 
 class BelongVerification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bv')
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='bv')
     belong = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
 
 
 class BVImage(models.Model):
-    bv = models.ForeignKey(
+    bv = models.OneToOneField(
         BelongVerification, on_delete=models.CASCADE, related_name='image')
-    image = models.ForeignKey(
+    data = models.OneToOneField(
         Image, on_delete=models.CASCADE, related_name='bv')
 
 
 class IdentityVerification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='iv')
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name='iv')
     realname = models.CharField(max_length=255)
     birthdate = models.CharField(max_length=8)
     gender = models.IntegerField()

@@ -32,7 +32,7 @@ class Feed(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='feed')
     before = models.ForeignKey(
-        "self", on_delete=models.SET_NULL, related_name='next', null=True)
+        "self", on_delete=models.SET_NULL, related_name='next', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -45,14 +45,14 @@ class Like(models.Model):
 
 
 class FeedImage(models.Model):
-    feed = models.ForeignKey(
+    feed = models.OneToOneField(
         Feed, on_delete=models.CASCADE, related_name='image')
     data = models.OneToOneField(
         Image, on_delete=models.CASCADE, null=True)
 
 
 class FeedText(models.Model):
-    feed = models.ForeignKey(
+    feed = models.OneToOneField(
         Feed, on_delete=models.CASCADE, related_name='text')
     value = models.CharField(max_length=255)
 
