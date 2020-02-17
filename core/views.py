@@ -5,6 +5,32 @@ from .models import *
 from authorization.models import *
 
 
+class MatchRequestView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+
+        if(hasattr(user, 'match_request')):
+            mr = user.match_request.last()
+            data = {
+                'requested_on': mr.requested_on,
+                'matched_on': mr.matched_on,
+                'status': mr.status,
+            }
+            return Response(status=status.HTTP_200_OK, data=data)
+        else:
+            return Response(status=status.HTTP_200_OK, data="no match request")
+
+    def post(self, request, *args, **kwags):
+        user = User.objects.get(uid='1150721062')
+
+        match_request = MatchRequest(
+            user=user,
+            status=MatchRequest.STATUS_CODE_MATCHING
+        )
+        match_request.save()
+        return Response(status=status.HTTP_200_OK, data="successfully requested")
+
+
 class FeedListView(APIView):
     def get(self, request, *args, **kwargs):
         feed_list = []
