@@ -7,6 +7,8 @@ from allauth.socialaccount.providers.apple.views import AppleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 from .serializers import UserSerializer
 from .models import *
+from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
+from file_management.models import *
 
 
 class UserInfoView(APIView):
@@ -59,6 +61,47 @@ class ProfileImageView(APIView):
         for image in images:
             data.append({'src': image.data.src, 'is_main': image.is_main})
         return Response(status=status.HTTP_200_OK, data=data)
+
+
+class BelongVerificationView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        if(hasattr(user, 'bv')):
+            bv = user.bv
+            data = {
+                'belong': bv.belong,
+                'department': bv.department,
+                'verified': false
+            }
+            if(hasattr(bv, image)):
+                bv_image = bv.image
+                data['image'] = "http://127.0.0.1:8000/media/" + \
+                    bv_image.data.src
+                data['verified'] = bv_image.is_checked
+            return Response(status=status.HTTP_200_OK, data=data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        if(hasattr(user, 'bv')):
+            bv = user.bv
+            bv.belong = request.data['belong']
+            bv.department = request.data['department']
+            bv.save()
+            TAG = "BV"
+            file_name = save_uploaded_file(request.data['image'], TAG)
+            image = Image(
+                src=TAG + "/" + file_name
+            )
+            image.save()
+            bv_image = BVImage(
+                bv=bv,
+                data=image
+            )
+            bv_image.save()
+            rotate_image(get_file_path(file_name, TAG))
+            return Response(status=status.HTTP_200_OK, data="successfully uploaded")
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class KakaoLoginView(SocialLoginView):
