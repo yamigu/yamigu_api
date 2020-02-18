@@ -10,6 +10,7 @@ import os
 class HookView(APIView):
     def post(self, request, *args, **kwargs):
         SCRIPT_PATH = os.path.join(settings.BASE_DIR, 'deploy/hooks.sh')
+
         payload = request.data['payload']
         ref = payload['ref']
         if ref == 'refs/heads/deploy':
