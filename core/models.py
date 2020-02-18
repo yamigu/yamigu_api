@@ -1,16 +1,16 @@
 from django.db import models
-from authorization.models import User
+from authorization.models import User, IdentityVerification
 from file_management.models import Image
 
 
 class FriendRequest(models.Model):
     requestee = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='received_request')
+        IdentityVerification, on_delete=models.CASCADE, related_name='received_request')
     requestor = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='sent_request')
-    requested_on = models.DateTimeField()
-    approved_on = models.DateTimeField()
-    declined_on = models.DateTimeField()
+        IdentityVerification, on_delete=models.CASCADE, related_name='sent_request')
+    requested_on = models.DateTimeField(auto_now_add=True)
+    approved_on = models.DateTimeField(blank=True, null=True)
+    declined_on = models.DateTimeField(blank=True, null=True)
 
 
 class Shield(models.Model):

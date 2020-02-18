@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import *
 from authorization.models import *
-from django.utils.datastructures import MultiValueDictKeyError
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class MatchRequestView(APIView):
@@ -114,41 +114,61 @@ class FriendView(APIView):
         user = User.objects.get(uid='1150721062')
         data = []
         if(hasattr(user, 'iv')):
+            request_list = []
             if hasattr(user.iv, 'received_request'):
                 received_list = user.iv.received_request.all()
-                for request in received_list:
-                    temp = {}
-                    if(request.approved_on is not None):
-                        temp['is_approved'] = True
-                        friend = None
-                        if(request.requestee == user.iv):
-                            friend = request.requestor.user
-                            birthdate = request.requestor.birthdate
-                        else:
-                            friend = request.requestee.user
-                            birthdate = request.requestee.birthdate
-                        friend_info = {
-                            'nickname': friend.nickname,
-                            'belong': friend.bv.belong,
-                            'department': friend.bv.department,
-                            'birthdate': birthdate,
-                        }
-                        temp['user_info'] = friend_info
-                    else:
-                        temp['is_approved'] = False
-                        friend_iv = None
-                        if(request.requestee == user.iv):
-                            friend_iv = request.requestor
-                            temp['you_sent'] = False
-                        else:
-                            friend_iv = request.requestee
-                            temp['you_sent'] = True
-                        friend_info = {
-                            'phoneno': friend_iv.phoneno
-                        }
-                        temp['user_info'] = friend_info
-                    data.append(temp)
+                request_list.extend(received_list)
+
             if hasattr(user.iv, 'sent_request'):
                 sent_list = user.iv.sent_request.all()
+                request_list.extend(sent_list)
 
+            for request in request_list:
+                temp = {}
+                if(request.approved_on is not None):
+                    temp['is_approved'] = True
+                    friend = None
+                    if(request.requestee == user.iv):
+                        friend = request.requestor.user
+                        birthdate = request.requestor.birthdate
+                    else:
+                        friend = request.requestee.user
+                        birthdate = request.requestee.birthdate
+                    friend_info = {
+                        'nickname': friend.nickname,
+                        'belong': friend.bv.belong,
+                        'department': friend.bv.department,
+                        'birthdate': birthdate,
+                    }
+                    temp['user_info'] = friend_info
+                else:
+                    temp['is_approved'] = False
+                    friend_iv = None
+                    if(request.requestee == user.iv):
+                        friend_iv = request.requestor
+                        temp['you_sent'] = False
+                    else:
+                        friend_iv = request.requestee
+                        temp['you_sent'] = True
+                    friend_info = {
+                        'phoneno': friend_iv.phoneno
+                    }
+                    temp['user_info'] = friend_info
+                data.append(temp)
         return Response(status=status.HTTP_200_OK, data=data)
+
+    def post(self, request, *args, **kwargs):
+        phoneno = '01044851971'
+        requestor_iv = User.objects.get(uid='1150721062').iv
+        requestee_iv = None
+        try:
+            requestee_iv = IdentityVerification.objects.get(phoneno=phoneno)
+        except ObjectDoesNotExist:
+            requestee_iv = IdentityVerification(phoneno=phoneno)
+            requestee_iv.save()
+        friend_request = FriendRequest(
+            requestor=requestor_iv,
+            requestee=requestee_iv
+        )
+        friend_request.save()
+        return Response(status=status.HTTP_200_OK, date="successfully requested")
