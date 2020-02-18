@@ -61,6 +61,38 @@ class FeedListView(APIView):
         return Response(status=status.HTTP_200_OK, data=feed_list)
 
 
+class FeedView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        data = {}
+        return Response(status=status.HTTP_200_OK, data=data)
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        before = None
+        if(hasattr(user, 'feed')):
+            before = user.feed.last()
+        feed = Feed(
+            user=user,
+            before=before
+        )
+        feed.save()
+        TAG = "Feed"
+        file_name = save_uploaded_file(request.data['image'], TAG)
+        image = Image(
+            src=TAG + "/" + file_name
+        )
+        image.save()
+        feed_image = FeedImage(
+            feed=feed,
+            data=image
+        )
+        feed_image.save()
+        rotate_image(get_file_path(file_name, TAG))
+
+        return Response(status=status.HTTP_200_OK, data="successfully created")
+
+
 class ShieldView(APIView):
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid='1150721062')
@@ -107,6 +139,29 @@ class LikeView(APIView):
         like = Like(user=user, feed=feed)
         like.save()
         return Response(status=status.HTTP_201_CREATED, data="successfully created")
+
+
+class BothLikeView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        user_like = []
+        like_user = []
+        user_like_set = {}
+        like_user_set = {}
+        if(hasattr(user, 'like')):
+            user_like_feed_list = user.like.all()
+            for like in user_like_feed_list:
+                user_like.append(like.feed.user.uid)
+            user_like_set = set(user_like)
+        if(hasattr(user, 'feed')):
+            feed_list_of_user = user.feed.all()
+            for feed in feed_list_of_user:
+                like_feed_user_list = feed.like.all()
+                for like in like_feed_user_list:
+                    like_user.append(like.user.uid)
+            like_user_set = set(like_user)
+        data = {'user_list': user_like_set & like_user_set}
+        return Response(status=status.HTTP_200_OK, data=data)
 
 
 class FriendView(APIView):

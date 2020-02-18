@@ -9,4 +9,5 @@ urlpatterns = [
     path('shield/', ShieldView.as_view()),
     path('like/', LikeView.as_view()),
     path('friend/', FriendView.as_view()),
+    path('both_like/', BothLikeView.as_view()),
 ]

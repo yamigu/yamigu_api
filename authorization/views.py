@@ -9,6 +9,8 @@ from .serializers import UserSerializer
 from .models import *
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from file_management.models import *
+from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
 
 
 class UserInfoView(APIView):
@@ -59,8 +61,33 @@ class ProfileImageView(APIView):
         data = []
         images = user.image.all()
         for image in images:
-            data.append({'src': image.data.src, 'is_main': image.is_main})
+            data.append({'src': image.data.src, 'number': image.number})
         return Response(status=status.HTTP_200_OK, data=data)
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        number = request.data['number']
+        TAG = "Profile"
+        file_name = save_uploaded_file(request.data['image'], TAG)
+        image = Image(
+            src=TAG + "/" + file_name
+        )
+        image.save()
+        profile_image = None
+        try:
+            profile_image = ProfileImage.objects.get(number=number)
+            profile_image.data = image
+            now = datetime.today()
+            profile_image.updated_on = now
+        except ObjectDoesNotExist:
+            profile_image = ProfileImage(
+                user=user,
+                data=image,
+                number=number
+            )
+        profile_image.save()
+        rotate_image(get_file_path(file_name, TAG))
+        return Response(status=status.HTTP_200_OK, data="successfully updated")
 
 
 class BelongVerificationView(APIView):

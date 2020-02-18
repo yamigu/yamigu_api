@@ -70,7 +70,8 @@ class ProfileImage(models.Model):
         User, on_delete=models.CASCADE, related_name='image')
     data = models.OneToOneField(
         Image, on_delete=models.CASCADE, related_name='profile')
-    is_main = models.BooleanField(default=False)
+    number = models.SmallIntegerField(default=0)
+    updated_on = models.DateTimeField(auto_now_add=True)
 
 
 class BelongVerification(models.Model):
