@@ -57,3 +57,18 @@ class FeedListView(APIView):
             feed_list.append(data)
 
         return Response(status=status.HTTP_200_OK, data=feed_list)
+
+
+class ShieldView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        data = []
+        if(hasattr(user.shield)):
+            shields = user.shield.all()
+            for shield in shields:
+                if not shield.phoneno.empty():
+                    data.append({'phoneno': shield.phoneno})
+                else:
+                    data.append({'belong': shield.belong})
+            return Response(status=status.HTTP_200_OK, data=data)
+        return Response(status=status.HTTP_200_OK, data="No shield")

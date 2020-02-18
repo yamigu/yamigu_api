@@ -18,7 +18,7 @@ class Shield(models.Model):
         User, on_delete=models.CASCADE, related_name='shield')
     phoneno = models.CharField(max_length=255)
     belong = models.CharField(max_length=255)
-    hide_department = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class MatchRequest(models.Model):

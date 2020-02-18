@@ -54,6 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    hide_department = models.BooleanField(default=False)
     num_of_yami = models.IntegerField(default=0)
     num_of_free = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
