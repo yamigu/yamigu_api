@@ -11,4 +11,5 @@ urlpatterns = [
     path('user/profile/', ProfileImageView.as_view()),
     path('user/signup/', SignupView.as_view()),
     path('user/belong_verification/', BelongVerificationView.as_view()),
+    path('user/identity_verification/', IdentityVerificationView.as_view()),
 ]

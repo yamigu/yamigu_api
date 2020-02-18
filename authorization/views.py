@@ -104,6 +104,25 @@ class BelongVerificationView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class IdentityVerificationView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid=request.data['uid'])
+        realname = request.data['name']
+        birthdate = request.data['birthdate']
+        gender = request.data['gender']
+        phoneno = request.data['mobileno']
+
+        iv = IdentityVerification(
+            user=user,
+            realname=realname,
+            birthdate=birthdate,
+            gender=gender,
+            phoneno=phoneno
+        )
+        iv.save()
+        return Response(status=status.HTTP_200_OK, data="successfully requested")
+
+
 class KakaoLoginView(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
 
