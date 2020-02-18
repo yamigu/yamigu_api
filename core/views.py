@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import *
 from authorization.models import *
+from django.utils.datastructures import MultiValueDictKeyError
 
 
 class MatchRequestView(APIView):
@@ -72,3 +73,19 @@ class ShieldView(APIView):
                     data.append({'belong': shield.belong})
             return Response(status=status.HTTP_200_OK, data=data)
         return Response(status=status.HTTP_200_OK, data="No shield")
+
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        phoneno_list = request.POST.getlist('phoneno')
+        belong = request.POST.get('belong')
+        if len(phoneno_list) > 0:
+            for phoneno in phoneno_list:
+                shield = Shield(user=user, phoneno=phoneno)
+                shield.save()
+            return Response(status=status.HTTP_200_OK, data="successfully created")
+        elif belong is not None:
+            shield = Shield(user=user, belong=belong)
+            shield.save()
+            return Response(status=status.HTTP_200_OK, data="successfully created")
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)

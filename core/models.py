@@ -16,8 +16,8 @@ class FriendRequest(models.Model):
 class Shield(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='shield')
-    phoneno = models.CharField(max_length=255)
-    belong = models.CharField(max_length=255)
+    phoneno = models.CharField(max_length=255, blank=True, null=True)
+    belong = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
