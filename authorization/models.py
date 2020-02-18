@@ -93,8 +93,8 @@ class BVImage(models.Model):
 
 class IdentityVerification(models.Model):
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name='iv')
+        User, on_delete=models.CASCADE, related_name='iv', blank=True, null=True)
     realname = models.CharField(max_length=255)
     birthdate = models.CharField(max_length=8)
     gender = models.IntegerField()
-    phoneno = models.CharField(max_length=14)
+    phoneno = models.CharField(max_length=14, primary_key=True)

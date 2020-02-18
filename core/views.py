@@ -55,6 +55,7 @@ class FeedListView(APIView):
                 feed_data['img_src'] = feed.image.data.src
                 feed_data['datetime'] = feed.created_at
                 data['feeds'].append(feed_data)
+                # TODO: 좋아요 했는지 여부 추가
             feed_list.append(data)
 
         return Response(status=status.HTTP_200_OK, data=feed_list)
@@ -89,3 +90,65 @@ class ShieldView(APIView):
             return Response(status=status.HTTP_200_OK, data="successfully created")
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class LikeView(APIView):
+    def get(self, request, *args, **kwargs):
+        feed = Feed.objects.get(id=2)
+        likes = feed.like.all()
+        data = []
+        for like in likes:
+            data.append({'who': like.user.uid, 'is_unread': like.is_unread})
+        return Response(status=status.HTTP_200_OK, data=data)
+
+    def post(self, request, *args, **kwargs):
+        feed = Feed.objects.get(id=2)
+        user = User.objects.get(uid='1193712316')
+        like = Like(user=user, feed=feed)
+        like.save()
+        return Response(status=status.HTTP_201_CREATED, data="successfully created")
+
+
+class FriendView(APIView):
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(uid='1150721062')
+        data = []
+        if(hasattr(user, 'iv')):
+            if hasattr(user.iv, 'received_request'):
+                received_list = user.iv.received_request.all()
+                for request in received_list:
+                    temp = {}
+                    if(request.approved_on is not None):
+                        temp['is_approved'] = True
+                        friend = None
+                        if(request.requestee == user.iv):
+                            friend = request.requestor.user
+                            birthdate = request.requestor.birthdate
+                        else:
+                            friend = request.requestee.user
+                            birthdate = request.requestee.birthdate
+                        friend_info = {
+                            'nickname': friend.nickname,
+                            'belong': friend.bv.belong,
+                            'department': friend.bv.department,
+                            'birthdate': birthdate,
+                        }
+                        temp['user_info'] = friend_info
+                    else:
+                        temp['is_approved'] = False
+                        friend_iv = None
+                        if(request.requestee == user.iv):
+                            friend_iv = request.requestor
+                            temp['you_sent'] = False
+                        else:
+                            friend_iv = request.requestee
+                            temp['you_sent'] = True
+                        friend_info = {
+                            'phoneno': friend_iv.phoneno
+                        }
+                        temp['user_info'] = friend_info
+                    data.append(temp)
+            if hasattr(user.iv, 'sent_request'):
+                sent_list = user.iv.sent_request.all()
+
+        return Response(status=status.HTTP_200_OK, data=data)

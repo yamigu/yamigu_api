@@ -45,6 +45,7 @@ class Like(models.Model):
     feed = models.ForeignKey(
         Feed, on_delete=models.CASCADE, related_name='like')
     is_unread = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class FeedImage(models.Model):
