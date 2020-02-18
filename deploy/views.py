@@ -11,7 +11,7 @@ import json
 class HookView(APIView):
     def post(self, request, *args, **kwargs):
         SCRIPT_PATH = os.path.join(settings.BASE_DIR, 'deploy/hooks.sh')
-        # payload from webhook
+        # payload from webhook test
         payload = json.loads(request.body.decode('utf-8'))
         ref = payload['ref']
         if ref == 'refs/heads/deploy':
