@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'authorization',
     'file_management',
     'purchase',
+    'deploy',
     # my apps end
 
     'django.contrib.sites',
