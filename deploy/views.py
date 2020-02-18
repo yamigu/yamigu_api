@@ -5,13 +5,14 @@ from rest_framework.response import Response
 from django.conf import settings
 import subprocess
 import os
+import json
 
 
 class HookView(APIView):
     def post(self, request, *args, **kwargs):
         SCRIPT_PATH = os.path.join(settings.BASE_DIR, 'deploy/hooks.sh')
 
-        payload = request.data['payload']
+        payload = json.loads(request.body.decode('utf-8'))
         ref = payload['ref']
         if ref == 'refs/heads/deploy':
             output = subprocess.run(['bash', SCRIPT_PATH]).stdout
