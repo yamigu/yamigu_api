@@ -31,16 +31,19 @@ class MatchRequestView(APIView):
         date = request.data['date']
         min_age = request.data['min_age']
         max_age = request.data['max_age']
-        match_request = MatchRequest(
-            user=user,
-            status=MatchRequest.STATUS_CODE_MATCHING,
-            personnel_selected=personnel,
-            date_selected=date,
-            min_age=min_age,
-            max_age=max_age
-        )
-        match_request.save()
-        return Response(status=status.HTTP_200_OK, data="successfully requested")
+        data = {
+            'user': user,
+            'status': MatchRequestSerializer.STATUS_CODE_MATCHING,
+            'personnel_selected': personnel,
+            'date_selected': date,
+            'min_age': min_age,
+            'max_age': max_age,
+        }
+        serializer = MatchRequestSerializer(data=data)
+        if serializer.valid():
+            serializer.save()
+            return Response(status=status.HTTP_200_OK, data="successfully requested")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
 class FeedListView(APIView):
