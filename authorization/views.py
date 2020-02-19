@@ -9,6 +9,7 @@ from .serializers import UserSerializer
 from .models import *
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from file_management.models import *
+from file_management.serializers import *
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 
@@ -61,7 +62,8 @@ class ProfileImageView(APIView):
         data = []
         images = user.image.all()
         for image in images:
-            data.append({'src': image.data.src, 'number': image.number})
+            data.append({'src': ImageSerializer(
+                image.data).data, 'number': image.number})
         return Response(status=status.HTTP_200_OK, data=data)
 
     def post(self, request, *args, **kwargs):

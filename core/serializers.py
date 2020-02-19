@@ -3,6 +3,7 @@ from django.db import models
 from .models import *
 from authorization.serializers import ProfileSerializer
 from drf_yasg.utils import swagger_serializer_method
+from file_management.serializers import ImageSerializer
 
 
 class MatchRequestSerializer(ModelSerializer):
@@ -17,7 +18,7 @@ class FeedSerializer(ModelSerializer):
 
     def get_img_src(self, feed):
         if(hasattr(feed, 'image')):
-            return feed.image.data.src
+            return ImageSerializer(feed.image).data
         return None
 
     class Meta:
