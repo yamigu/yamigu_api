@@ -26,6 +26,10 @@ class MatchRequest(models.Model):
     STATUS_CODE_MATCHED = 2
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='match_request')
+    personnel_selected = models.SmallIntegerField(default=0)
+    date_selected = models.SmallIntegerField(default=0)
+    min_age = models.SmallIntegerField(default=20)
+    max_age = models.SmallIntegerField(default=30)
     requested_on = models.DateTimeField(auto_now_add=True, blank=True)
     matched_on = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0)

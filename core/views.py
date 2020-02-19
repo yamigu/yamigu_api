@@ -23,10 +23,17 @@ class MatchRequestView(APIView):
 
     def post(self, request, *args, **kwags):
         user = User.objects.get(uid='1150721062')
-
+        personnel = request.data['personnel']
+        date = request.data['date']
+        min_age = request.data['min_age']
+        max_age = request.data['max_age']
         match_request = MatchRequest(
             user=user,
-            status=MatchRequest.STATUS_CODE_MATCHING
+            status=MatchRequest.STATUS_CODE_MATCHING,
+            personnel_selected=personnel,
+            date_selected=date,
+            min_age=min_age,
+            max_age=max_age
         )
         match_request.save()
         return Response(status=status.HTTP_200_OK, data="successfully requested")
