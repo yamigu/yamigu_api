@@ -1,6 +1,7 @@
 # party/serializers.py
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, CurrentUserDefault, CharField, SerializerMethodField
 from django.contrib.auth import get_user_model
+from file_management.serializers import *
 
 
 class UserSerializer(ModelSerializer):
@@ -33,7 +34,7 @@ class ProfileSerializer(ModelSerializer):
     def get_avata(self, user):
         if(hasattr(user, 'image')):
             if(user.image.last() is not None):
-                return user.image.last().data.src
+                return ImageSerializer(user.image.last().data).data['src']
         return None
 
     class Meta:

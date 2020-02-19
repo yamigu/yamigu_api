@@ -18,7 +18,7 @@ class FeedSerializer(ModelSerializer):
 
     def get_img_src(self, feed):
         if(hasattr(feed, 'image')):
-            return ImageSerializer(feed.image).data
+            return ImageSerializer(feed.image.data).data['src']
         return None
 
     class Meta:

@@ -62,8 +62,9 @@ class ProfileImageView(APIView):
         data = []
         images = user.image.all()
         for image in images:
-            data.append({'src': ImageSerializer(
-                image.data).data, 'number': image.number})
+            temp = ImageSerializer(image.data).data
+            temp['number'] = image.number
+            data.append(temp)
         return Response(status=status.HTTP_200_OK, data=data)
 
     def post(self, request, *args, **kwargs):
