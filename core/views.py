@@ -4,9 +4,12 @@ from rest_framework.response import Response
 from .models import *
 from authorization.models import *
 from django.core.exceptions import ObjectDoesNotExist
+from drf_yasg.utils import swagger_auto_schema
+from .serializers import *
 
 
 class MatchRequestView(APIView):
+    @swagger_auto_schema(responses={200: MatchRequestSerializer(), 204: "No Match Request"})
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid='1150721062')
 
@@ -19,8 +22,9 @@ class MatchRequestView(APIView):
             }
             return Response(status=status.HTTP_200_OK, data=data)
         else:
-            return Response(status=status.HTTP_200_OK, data="no match request")
+            return Response(status=status.HTTP_204_NO_CONTENT, data="no match request")
 
+    @swagger_auto_schema(request_body=MatchRequestSerializer)
     def post(self, request, *args, **kwags):
         user = User.objects.get(uid='1150721062')
         personnel = request.data['personnel']
