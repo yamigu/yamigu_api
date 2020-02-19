@@ -9,6 +9,11 @@ from .serializers import *
 
 
 class MatchRequestView(APIView):
+    """
+        미팅 주선 신청
+
+        ---
+    """
     @swagger_auto_schema(responses={200: MatchRequestSerializer(), 204: "No Match Request"})
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid='1150721062')
@@ -40,47 +45,45 @@ class MatchRequestView(APIView):
             'max_age': max_age,
         }
         serializer = MatchRequestSerializer(data=data)
-        if serializer.valid():
+        if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_200_OK, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
 class FeedListView(APIView):
+    """
+        피드 List
+
+        ---
+    """
+    @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
-        feed_list = []
         users = User.objects.all()
-        for user in users:
-            data = {}
-            user_data = {}
-            user_data['username'] = user.username
-            user_data['nickname'] = user.nickname
-            if(hasattr(user, 'iv')):
-                user_data['birth'] = user.iv.birthdate
-            if(hasattr(user, 'bv')):
-                user_data['belong'] = user.bv.belong
-                user_data['department'] = user.bv.department
-
-            data['user'] = user_data
-            data['feeds'] = []
-            feed_for_user = user.feed.all()
-            for feed in feed_for_user:
-                feed_data = {}
-                feed_data['img_src'] = feed.image.data.src
-                feed_data['datetime'] = feed.created_at
-                data['feeds'].append(feed_data)
-                # TODO: 좋아요 했는지 여부 추가
-            feed_list.append(data)
-
-        return Response(status=status.HTTP_200_OK, data=feed_list)
+        serializer = FeedListSerializer(users, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 class FeedView(APIView):
-    def get(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
-        data = {}
-        return Response(status=status.HTTP_200_OK, data=data)
+    """
+        피드 자세히 보기
 
+        ---
+    """
+    @swagger_auto_schema(responses={200: FeedSerializer()})
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(uid=kwargs.get('uid'))
+        serializer = FeedSerializer(user.feed.all(), many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+
+class FeedCreateView(APIView):
+    """
+        피드 생성
+
+        ---
+    """
+    @swagger_auto_schema(request_body=FeedCreateSerializer(), responses={201: "successfully created"})
     def post(self, request, *args, **kwargs):
         user = User.objects.get(uid='1150721062')
         before = None
@@ -108,6 +111,12 @@ class FeedView(APIView):
 
 
 class ShieldView(APIView):
+    """
+        아는 사람 피하기
+
+        ---
+    """
+
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid='1150721062')
         data = []
@@ -139,16 +148,21 @@ class ShieldView(APIView):
 
 
 class LikeView(APIView):
-    def get(self, request, *args, **kwargs):
-        feed = Feed.objects.get(id=2)
-        likes = feed.like.all()
-        data = []
-        for like in likes:
-            data.append({'who': like.user.uid, 'is_unread': like.is_unread})
-        return Response(status=status.HTTP_200_OK, data=data)
+    """
+        좋아요
 
+        ---
+    """
+    @swagger_auto_schema(responses={200: LikeSerializer()})
+    def get(self, request, *args, **kwargs):
+        feed = Feed.objects.get(id=kwargs.get('fid'))
+        likes = feed.like.all()
+        serializer = LikeSerializer(likes, many=True)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    @swagger_auto_schema(responses={201: 'successfully created'})
     def post(self, request, *args, **kwargs):
-        feed = Feed.objects.get(id=2)
+        feed = Feed.objects.get(id=kwargs.get('fid'))
         user = User.objects.get(uid='1193712316')
         like = Like(user=user, feed=feed)
         like.save()
@@ -156,6 +170,12 @@ class LikeView(APIView):
 
 
 class BothLikeView(APIView):
+    """
+        서로 좋아요 List
+
+        ---
+    """
+
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid='1150721062')
         user_like = []
@@ -179,9 +199,14 @@ class BothLikeView(APIView):
 
 
 class FriendView(APIView):
+    """
+        친구
+
+        ---
+    """
+    @swagger_auto_schema(responses={200: FriendRequestSerializer(), 204: 'No friend'})
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid='1150721062')
-        data = []
         if(hasattr(user, 'iv')):
             request_list = []
             if hasattr(user.iv, 'received_request'):
@@ -191,41 +216,12 @@ class FriendView(APIView):
             if hasattr(user.iv, 'sent_request'):
                 sent_list = user.iv.sent_request.all()
                 request_list.extend(sent_list)
+            serializer = FriendRequestSerializer(
+                request_list, many=True, context={'user': user})
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT, data="No friend")
 
-            for request in request_list:
-                temp = {}
-                if(request.approved_on is not None):
-                    temp['is_approved'] = True
-                    friend = None
-                    if(request.requestee == user.iv):
-                        friend = request.requestor.user
-                        birthdate = request.requestor.birthdate
-                    else:
-                        friend = request.requestee.user
-                        birthdate = request.requestee.birthdate
-                    friend_info = {
-                        'nickname': friend.nickname,
-                        'belong': friend.bv.belong,
-                        'department': friend.bv.department,
-                        'birthdate': birthdate,
-                    }
-                    temp['user_info'] = friend_info
-                else:
-                    temp['is_approved'] = False
-                    friend_iv = None
-                    if(request.requestee == user.iv):
-                        friend_iv = request.requestor
-                        temp['you_sent'] = False
-                    else:
-                        friend_iv = request.requestee
-                        temp['you_sent'] = True
-                    friend_info = {
-                        'phoneno': friend_iv.phoneno
-                    }
-                    temp['user_info'] = friend_info
-                data.append(temp)
-        return Response(status=status.HTTP_200_OK, data=data)
-
+    @swagger_auto_schema(request_body=SendFriendRequestSerialzier, responses={201: 'successfully requested'})
     def post(self, request, *args, **kwargs):
         phoneno = '01044851971'
         requestor_iv = User.objects.get(uid='1150721062').iv
@@ -240,4 +236,4 @@ class FriendView(APIView):
             requestee=requestee_iv
         )
         friend_request.save()
-        return Response(status=status.HTTP_200_OK, date="successfully requested")
+        return Response(status=status.HTTP_201_OK, date="successfully requested")
