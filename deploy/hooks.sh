@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "push"
-git checkout -t origin/deploy
+git checkout deploy
 git pull origin deploy
 pip install -r requirements.txt 
 #TODO: just for test now
