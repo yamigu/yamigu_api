@@ -29,14 +29,6 @@ class UserInfoView(APIView):
 
         uid = user.uid
 
-        try:
-            auth.update_user(
-                uid=uid,
-                display_name=user.nickname,
-            )
-        except UserNotFoundError:
-            auth.create_user(uid=user.uid)
-
         queryset = User.objects.select_related().get(id=user.id)
         serializer = UserSerializer(queryset, many=False)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
