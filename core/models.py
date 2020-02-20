@@ -12,6 +12,23 @@ class FriendRequest(models.Model):
     approved_on = models.DateTimeField(blank=True, null=True)
     declined_on = models.DateTimeField(blank=True, null=True)
 
+    def __str__(self):
+        requestee_disp = ''
+        requestor_disp = ''
+        requestee = self.requestee
+        requestor = self.requestor
+        if hasattr(requestee, 'user'):
+            requestee_disp = requestee_disp + \
+                (requestee.user.nickname if requestee.user.nickname is not None else '')
+        if hasattr(requestor, 'user'):
+            requestor_disp = requestor_disp + \
+                (requestor.user.nickname if requestor.user.nickname is not None else '')
+
+        requestee_disp = requestee_disp + ' ' + requestee.phoneno
+        requestor_disp = requestor_disp + ' ' + requestor.phoneno
+
+        return requestee_disp + ' -> ' + requestor_disp
+
 
 class Shield(models.Model):
     user = models.ForeignKey(
