@@ -20,15 +20,10 @@ class MatchRequestView(APIView):
     @swagger_auto_schema(responses={200: MatchRequestSerializer(), 204: "No Match Request"})
     def get(self, request, *args, **kwargs):
         user = request.user
-
         if(hasattr(user, 'match_request')):
             mr = user.match_request.last()
-            data = {
-                'requested_on': mr.requested_on,
-                'matched_on': mr.matched_on,
-                'status': mr.status,
-            }
-            return Response(status=status.HTTP_200_OK, data=data)
+            serializer = MatchRequestSerializer(mr)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
         else:
             return Response(status=status.HTTP_204_NO_CONTENT, data="no match request")
 
