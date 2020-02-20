@@ -5,7 +5,7 @@ from core.urls import urlpatterns as core_url_patterns
 from deploy.urls import urlpatterns as deploy_url_patterns
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
-
+from django.conf import settings
 schema_view = get_schema_view(
     openapi.Info(
         title="yamigu API",
@@ -26,3 +26,7 @@ urlpatterns = [
     path('docs/', schema_view.with_ui('redoc',
                                       cache_timeout=0), name='schema-swagger-ui'),
 ]
+
+if setting.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
