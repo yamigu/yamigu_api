@@ -39,4 +39,5 @@ class ProfileSerializer(ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('nickname', 'birthdate', 'belong', 'department', 'avata')
+        fields = ('uid', 'nickname', 'birthdate',
+                  'belong', 'department', 'avata')
