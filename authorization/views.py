@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.apple.views import AppleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
-from .serializers import UserSerializer
+from .serializers import UserSerializer, ProfileSerializer
 from .models import *
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from file_management.models import *
@@ -30,7 +30,7 @@ class UserInfoView(APIView):
         uid = user.uid
 
         queryset = User.objects.select_related().get(id=user.id)
-        serializer = UserSerializer(queryset, many=False)
+        serializer = ProfileSerializer(queryset)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
