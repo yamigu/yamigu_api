@@ -27,7 +27,7 @@ class FriendRequest(models.Model):
         requestee_disp = requestee_disp + ' ' + requestee.phoneno
         requestor_disp = requestor_disp + ' ' + requestor.phoneno
 
-        return requestee_disp + ' -> ' + requestor_disp
+        return requestee_disp + ' -> ' + requestor_disp + ('(Approved)' if self.approved_on == True else '')
 
 
 class Shield(models.Model):
@@ -51,6 +51,9 @@ class MatchRequest(models.Model):
     matched_on = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0)
 
+    def __str__(self):
+        return '{} - {} - {}'.format(self.user.nickname, self.requested_on.strftime('%Y/%m/%d %H:%M'), self.status)
+
 
 class Feed(models.Model):
     user = models.ForeignKey(
@@ -58,6 +61,9 @@ class Feed(models.Model):
     before = models.ForeignKey(
         "self", on_delete=models.SET_NULL, related_name='next', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.user.nickname, self.created_at.strftime('%Y/%m/%d %H:%M'))
 
 
 class Like(models.Model):
@@ -67,6 +73,9 @@ class Like(models.Model):
         Feed, on_delete=models.CASCADE, related_name='like')
     is_unread = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return ''
 
 
 class FeedImage(models.Model):
