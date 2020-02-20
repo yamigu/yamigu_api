@@ -8,7 +8,7 @@ class ImageSerializer(ModelSerializer):
     def get_src(self, image):
         if 'http' in image.src:
             return image.src
-        return 'http://13.124.126.30:8080/media/' + image.src
+        return 'http://13.124.126.30:8000/media/' + image.src
 
     class Meta:
         model = Image
