@@ -46,8 +46,8 @@ class UserManager(BaseUserManager):
 
     def create_apple_user(self, user_pk, extra_data):
         user = User.objects.get(pk=user_pk)
-        user.username = 'apple-' + extra_data['id']
-        user.uid = str(extra_data['id'])
+        user.username = 'apple-' + extra_data['sub']
+        user.uid = str(extra_data['sub'])
         user.save(using=self._db)
         return user
 
