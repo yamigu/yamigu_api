@@ -20,7 +20,7 @@ class UserInfoView(APIView):
 
         ---
     """
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user = request.user
@@ -35,8 +35,10 @@ class UserInfoView(APIView):
 
 
 class SignupView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         user.nickname = request.data['nickname']
         user.is_student = True if request.data['is_student'] == 'true' else False
         user.bv.belong = request.data['belong']
@@ -48,9 +50,10 @@ class SignupView(APIView):
 
 
 class ProfileImageView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
-        #user = request.user
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         data = []
         images = user.image.all()
         for image in images:
@@ -60,7 +63,7 @@ class ProfileImageView(APIView):
         return Response(status=status.HTTP_200_OK, data=data)
 
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         number = request.data['number']
         TAG = "Profile"
         file_name = save_uploaded_file(request.data['image'], TAG)
@@ -86,8 +89,10 @@ class ProfileImageView(APIView):
 
 
 class BelongVerificationView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         if(hasattr(user, 'bv')):
             bv = user.bv
             data = {
@@ -104,7 +109,7 @@ class BelongVerificationView(APIView):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         if(hasattr(user, 'bv')):
             bv = user.bv
             bv.belong = request.data['belong']
@@ -127,8 +132,10 @@ class BelongVerificationView(APIView):
 
 
 class IdentityVerificationView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(uid=request.data['uid'])
+        user = request.user
         realname = request.data['name']
         birthdate = request.data['birthdate']
         gender = request.data['gender']

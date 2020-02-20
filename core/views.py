@@ -14,9 +14,11 @@ class MatchRequestView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(responses={200: MatchRequestSerializer(), 204: "No Match Request"})
     def get(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
 
         if(hasattr(user, 'match_request')):
             mr = user.match_request.last()
@@ -31,7 +33,7 @@ class MatchRequestView(APIView):
 
     @swagger_auto_schema(request_body=MatchRequestSerializer)
     def post(self, request, *args, **kwags):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         personnel = request.data['personnel']
         date = request.data['date']
         min_age = request.data['min_age']
@@ -57,6 +59,8 @@ class FeedListView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
         users = User.objects.all()
@@ -70,6 +74,8 @@ class FeedView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(responses={200: FeedSerializer()})
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid=kwargs.get('uid'))
@@ -83,9 +89,11 @@ class FeedCreateView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(request_body=FeedCreateSerializer(), responses={201: "successfully created"})
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         before = None
         if(hasattr(user, 'feed')):
             before = user.feed.last()
@@ -116,9 +124,10 @@ class ShieldView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         data = []
         if(hasattr(user.shield)):
             shields = user.shield.all()
@@ -131,7 +140,7 @@ class ShieldView(APIView):
         return Response(status=status.HTTP_200_OK, data="No shield")
 
     def post(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         phoneno_list = request.POST.getlist('phoneno')
         belong = request.POST.get('belong')
         if len(phoneno_list) > 0:
@@ -153,6 +162,8 @@ class LikeView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(responses={200: LikeSerializer()})
     def get(self, request, *args, **kwargs):
         feed = Feed.objects.get(id=kwargs.get('fid'))
@@ -163,7 +174,7 @@ class LikeView(APIView):
     @swagger_auto_schema(responses={201: 'successfully created'})
     def post(self, request, *args, **kwargs):
         feed = Feed.objects.get(id=kwargs.get('fid'))
-        user = User.objects.get(uid='1193712316')
+        user = request.user
         like = Like(user=user, feed=feed)
         like.save()
         return Response(status=status.HTTP_201_CREATED, data="successfully created")
@@ -175,9 +186,10 @@ class BothLikeView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = request.user
         user_like = []
         like_user = []
         user_like_set = {}
@@ -204,9 +216,11 @@ class FriendView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(responses={200: FriendRequestSerializer(), 204: 'No friend'})
     def get(self, request, *args, **kwargs):
-        user = User.objects.get(uid='1150721062')
+        user = requset.user
         if(hasattr(user, 'iv')):
             request_list = []
             if hasattr(user.iv, 'received_request'):
@@ -223,8 +237,9 @@ class FriendView(APIView):
 
     @swagger_auto_schema(request_body=SendFriendRequestSerialzier, responses={201: 'successfully requested'})
     def post(self, request, *args, **kwargs):
-        phoneno = '01044851971'
-        requestor_iv = User.objects.get(uid='1150721062').iv
+        phoneno = request.data['phoneno']
+        user = request.user
+        requestor_iv = user.iv
         requestee_iv = None
         try:
             requestee_iv = IdentityVerification.objects.get(phoneno=phoneno)
