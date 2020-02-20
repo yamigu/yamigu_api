@@ -44,6 +44,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+    def create_apple_user(self, user_pk, extra_data):
+        user = User.objects.get(pk=user_pk)
+        user.username = 'apple-' + extra_data['id']
+        user.uid = str(extra_data['id'])
+        user.save(using=self._db)
+        return user
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     uid = models.CharField(max_length=100, null=True, unique=True)
