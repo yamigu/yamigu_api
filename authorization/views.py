@@ -6,36 +6,44 @@ from rest_framework.permissions import IsAuthenticated
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
 from allauth.socialaccount.providers.apple.views import AppleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
-from .serializers import UserSerializer, ProfileSerializer
+from .serializers import *
 from .models import *
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from file_management.models import *
 from file_management.serializers import *
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
+from drf_yasg.utils import swagger_auto_schema
 
 
 class UserInfoView(APIView):
     """
-        유저 정보 API
+        유저 정보
 
         ---
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        user = request.user
-        if user is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
-
-        uid = user.uid
-
-        queryset = User.objects.select_related().get(id=user.id)
-        serializer = ProfileSerializer(queryset)
+        user = None
+        if kwargs.get('uid') == None:
+            user = request.user
+            if user is None:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
+        else:
+            user = User.objects.get(uid=kwargs.get('uid'))
+            if user is None:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
+        serializer = ProfileSerializer(user)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 class SignupView(APIView):
+    """
+        회원 가입
+
+        ---
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
@@ -51,6 +59,11 @@ class SignupView(APIView):
 
 
 class ProfileImageView(APIView):
+    """
+        마이 프로필 사진 리스트
+
+        ---
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
@@ -90,32 +103,25 @@ class ProfileImageView(APIView):
 
 
 class BelongVerificationView(APIView):
+    """
+        소속 정보
+
+        ---
+    """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(responses={200: BelongVerificationSerializer(), 404: "Not Found"})
     def get(self, request, *args, **kwargs):
         user = request.user
         if(hasattr(user, 'bv')):
-            bv = user.bv
-            data = {
-                'belong': bv.belong,
-                'department': bv.department,
-                'verified': false
-            }
-            if(hasattr(bv, image)):
-                bv_image = bv.image
-                data['image'] = "http://127.0.0.1:8000/media/" + \
-                    bv_image.data.src
-                data['verified'] = bv_image.is_checked
-            return Response(status=status.HTTP_200_OK, data=data)
+            serializer = BelongVerificationSerializer(user.bv)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+    @swagger_auto_schema(request_body=BelongVerificationSerializer, responses={200: "successfully uploaded", 400: "Bad Request"})
     def post(self, request, *args, **kwargs):
         user = request.user
         if(hasattr(user, 'bv')):
-            bv = user.bv
-            bv.belong = request.data['belong']
-            bv.department = request.data['department']
-            bv.save()
             TAG = "BV"
             file_name = save_uploaded_file(request.data['image'], TAG)
             image = Image(
@@ -123,34 +129,62 @@ class BelongVerificationView(APIView):
             )
             image.save()
             bv_image = BVImage(
-                bv=bv,
+                bv=user.bv,
                 data=image
             )
             bv_image.save()
             rotate_image(get_file_path(file_name, TAG))
-            return Response(status=status.HTTP_200_OK, data="successfully uploaded")
+
+            data = {
+                'belong': request.data['belong'],
+                'department': request.data['department'],
+            }
+            serializer = BelongVerificationSerializer(user.bv, data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_200_OK, data="successfully uploaded")
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class IdentityVerificationView(APIView):
+    """
+        본인 인증 정보
+
+        ---
+    """
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(responses={200: IdentityVerificationSerializer(), 404: "Not Found"})
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if hasattr(user, 'iv'):
+            serializer = IdentityVerificationSerializer(user.iv)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    @swagger_auto_schema(request_body=IdentityVerificationSerializer, responses={200: "successfully created", 400: "Bad Request"})
     def post(self, request, *args, **kwargs):
         user = request.user
-        realname = request.data['name']
-        birthdate = request.data['birthdate']
-        gender = request.data['gender']
-        phoneno = request.data['mobileno']
-
-        iv = IdentityVerification(
-            user=user,
-            realname=realname,
-            birthdate=birthdate,
-            gender=gender,
-            phoneno=phoneno
-        )
-        iv.save()
-        return Response(status=status.HTTP_200_OK, data="successfully requested")
+        data = {
+            'user': user.id,
+            'realname': request.data['realname'],
+            'birthdate': request.data['birthdate'],
+            'gender': request.data['gender'],
+            'phoneno': request.data['phoneno'],
+        }
+        iv = IdentityVerification.objects.get(phoneno=request.data['phoneno'])
+        if iv is not None:
+            serializer = IdentityVerificationSerializer(iv, data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_200_OK, data="successfully requested")
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+        serializer = IdentityVerificationSerializer(data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_200_OK, data="successfully requested")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
 class KakaoLoginView(SocialLoginView):

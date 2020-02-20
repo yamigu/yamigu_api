@@ -107,3 +107,4 @@ class IdentityVerification(models.Model):
     birthdate = models.CharField(max_length=8, blank=True, null=True)
     gender = models.IntegerField(blank=True, null=True)
     phoneno = models.CharField(max_length=14, primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)

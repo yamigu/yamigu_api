@@ -7,8 +7,8 @@ from .views import *
 urlpatterns = [
     path('oauth/kakao/', KakaoLoginView.as_view()),
     path('oauth/apple/', AppleLoginView.as_view()),
-
     path('user/info/', UserInfoView.as_view()),
+    path('user/info/<uid>/', UserInfoView.as_view()),
     path('user/profile_image/', ProfileImageView.as_view()),
     path('user/signup/', SignupView.as_view()),
     path('user/belong_verification/', BelongVerificationView.as_view()),

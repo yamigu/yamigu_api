@@ -1,7 +1,8 @@
 # party/serializers.py
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, CurrentUserDefault, CharField, SerializerMethodField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, StringRelatedField, BooleanField, ReadOnlyField
 from django.contrib.auth import get_user_model
 from file_management.serializers import *
+from .models import *
 
 
 class UserSerializer(ModelSerializer):
@@ -41,3 +42,25 @@ class ProfileSerializer(ModelSerializer):
         model = get_user_model()
         fields = ('uid', 'nickname', 'birthdate',
                   'belong', 'department', 'avata')
+
+
+class BVImageSerializer(ModelSerializer):
+    class Meta:
+        model = BVImage
+        fiels = '__all__'
+
+
+class BelongVerificationSerializer(ModelSerializer):
+    verified = BooleanField(source='image.is_checked',
+                            read_only=True, required=False)
+
+    class Meta:
+        model = BelongVerification
+        fields = ('belong', 'department', 'verified', 'image')
+        extra_kwargs = {'image': {'required': False}}
+
+
+class IdentityVerificationSerializer(ModelSerializer):
+    class Meta:
+        model = IdentityVerification
+        fields = '__all__'
