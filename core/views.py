@@ -30,8 +30,8 @@ class MatchRequestView(APIView):
     @swagger_auto_schema(request_body=MatchRequestSerializer)
     def post(self, request, *args, **kwags):
         user = request.user
-        personnel = request.data['personnel']
-        date = request.data['date']
+        personnel = request.data['personnel_selected']
+        date = request.data['date_selected']
         min_age = request.data['min_age']
         max_age = request.data['max_age']
         data = {
