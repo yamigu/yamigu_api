@@ -75,7 +75,22 @@ class Like(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return ''
+        feeds = self.feed.user.feed.all()
+        index = 0
+        for feed in feeds:
+            index = index + 1
+            if self.feed == feed:
+                break
+        index_str = ''
+        if(index == 1):
+            index_str = 'st'
+        elif(index == 2):
+            index_str = 'nd'
+        elif(index == 3):
+            index_str = 'rd'
+        else:
+            index_str = 'th'
+        return '{} likes {}\'s {}{} feed'.format(self.user.nickname, self.feed.user.nickname, index, index_str)
 
 
 class FeedImage(models.Model):
