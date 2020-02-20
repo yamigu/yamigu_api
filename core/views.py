@@ -236,4 +236,4 @@ class FriendView(APIView):
             requestee=requestee_iv
         )
         friend_request.save()
-        return Response(status=status.HTTP_201_CREATED, date="successfully requested")
+        return Response(status=status.HTTP_201_CREATED, data="successfully requested")
