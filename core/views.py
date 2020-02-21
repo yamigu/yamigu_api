@@ -209,13 +209,13 @@ class BothLikeView(APIView):
 
 class FriendView(APIView):
     """
-        친구
+        친구 리스트
 
         ---
     """
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(responses={200: FriendRequestSerializer(), 204: 'No friend'})
+    @swagger_auto_schema(responses={200: FriendRequestSerializer(), 204: 'No friend', 400: 'Bad Request'})
     def get(self, request, *args, **kwargs):
         user = None
         if kwargs.get('uid') == None:
@@ -225,7 +225,7 @@ class FriendView(APIView):
         else:
             user = User.objects.get(uid=kwargs.get('uid'))
             if user is None:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
+                return Response(status=status.HTTP_400_BAD_REQUEST, data="No Such User")
         if(hasattr(user, 'iv')):
             request_list = []
             if hasattr(user.iv, 'received_request'):
@@ -240,6 +240,14 @@ class FriendView(APIView):
             return Response(status=status.HTTP_200_OK, data=serializer.data)
         return Response(status=status.HTTP_204_NO_CONTENT, data="No friend")
 
+
+class FriendCreateView(APIView):
+    """
+        친구 요청
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=SendFriendRequestSerialzier, responses={201: 'successfully requested'})
     def post(self, request, *args, **kwargs):
         phoneno = request.data['phoneno']
