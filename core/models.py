@@ -17,10 +17,10 @@ class FriendRequest(models.Model):
         requestor_disp = ''
         requestee = self.requestee
         requestor = self.requestor
-        if hasattr(requestee, 'user'):
+        if hasattr(requestee, 'user') and requestee.user is not None:
             requestee_disp = requestee_disp + \
                 (requestee.user.nickname if requestee.user.nickname is not None else '')
-        if hasattr(requestor, 'user'):
+        if hasattr(requestor, 'user') and requestor.user is not None:
             requestor_disp = requestor_disp + \
                 (requestor.user.nickname if requestor.user.nickname is not None else '')
 
