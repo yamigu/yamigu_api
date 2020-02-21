@@ -62,7 +62,7 @@ class FeedListView(APIView):
 
     @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
-        users = User.objects.all()
+        users = User.objects.filter(feed__isnull=False)
         serializer = FeedListSerializer(users, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
