@@ -27,7 +27,7 @@ class FriendRequest(models.Model):
         requestee_disp = requestee_disp + ' ' + requestee.phoneno
         requestor_disp = requestor_disp + ' ' + requestor.phoneno
 
-        return requestee_disp + ' -> ' + requestor_disp + ('(Approved)' if self.approved_on == True else '')
+        return requestor_disp + ' -> ' + requestee_disp + ('(Approved)' if self.approved_on == True else '')
 
 
 class Shield(models.Model):
