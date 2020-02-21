@@ -29,7 +29,7 @@ class MatchRequestView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT, data="no match request")
 
     @swagger_auto_schema(request_body=MatchRequestSerializer)
-    def post(self, request, *args, **kwags):
+    def post(self, request, *args, **kwargs):
         user = request.user
         personnel = request.data['personnel_selected']
         date = request.data['date_selected']
@@ -217,7 +217,15 @@ class FriendView(APIView):
 
     @swagger_auto_schema(responses={200: FriendRequestSerializer(), 204: 'No friend'})
     def get(self, request, *args, **kwargs):
-        user = requset.user
+        user = None
+        if kwargs.get('uid') == None:
+            user = request.user
+            if user is None:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
+        else:
+            user = User.objects.get(uid=kwargs.get('uid'))
+            if user is None:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
         if(hasattr(user, 'iv')):
             request_list = []
             if hasattr(user.iv, 'received_request'):
