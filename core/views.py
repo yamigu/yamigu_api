@@ -37,7 +37,7 @@ class MatchRequestView(APIView):
         max_age = request.data['max_age']
         data = {
             'user': user,
-            'status': MatchRequestSerializer.STATUS_CODE_MATCHING,
+            'status': MatchRequest.STATUS_CODE_MATCHING,
             'personnel_selected': personnel,
             'date_selected': date,
             'min_age': min_age,

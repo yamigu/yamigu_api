@@ -60,7 +60,7 @@ class SignupView(APIView):
 
 class ProfileImageView(APIView):
     """
-        마이 프로필 사진 리스트
+        마이 프로필 사진
 
         ---
     """
@@ -87,7 +87,7 @@ class ProfileImageView(APIView):
         image.save()
         profile_image = None
         try:
-            profile_image = ProfileImage.objects.get(number=number)
+            profile_image = user.image.get(number=number)
             profile_image.data = image
             now = datetime.today()
             profile_image.updated_on = now
