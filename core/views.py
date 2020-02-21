@@ -8,6 +8,8 @@ from authorization.models import *
 from django.core.exceptions import ObjectDoesNotExist
 from drf_yasg.utils import swagger_auto_schema
 from .serializers import *
+from django.db import IntegrityError
+import datetime
 
 
 class MatchRequestView(APIView):
@@ -172,9 +174,35 @@ class LikeView(APIView):
     def post(self, request, *args, **kwargs):
         feed = Feed.objects.get(id=kwargs.get('fid'))
         user = request.user
-        like = Like(user=user, feed=feed)
-        like.save()
+        like = feed.like.get(user=user.id)
+        if like is not None:
+            like.value = True
+            like.created_at = datetime.datetime.now()
+            like.save()
+        else:
+            like = Like(user=user, feed=feed)
+            like.save()
         return Response(status=status.HTTP_201_CREATED, data="successfully created")
+
+
+class LikeCancelView(APIView):
+    """
+        좋아요 취소
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(responses={200: "successfully updated", 400: "Bad Request"})
+    def post(self, request, *args, **kwargs):
+        feed = Feed.objects.get(id=kwargs.get('fid'))
+        user = request.user
+        like = feed.like.get(user=user.id)
+        if like is not None:
+            like.value = False
+            like.created_at = datetime.datetime.now()
+            like.save()
+            return Response(status=status.HTTP_200_OK, data="successfully updated")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
 
 class BothLikeView(APIView):
@@ -229,11 +257,13 @@ class FriendView(APIView):
         if(hasattr(user, 'iv')):
             request_list = []
             if hasattr(user.iv, 'received_request'):
-                received_list = user.iv.received_request.all()
+                received_list = user.iv.received_request.filter(
+                    declined_on__isnull=True, canceled_on__isnull=True)
                 request_list.extend(received_list)
 
             if hasattr(user.iv, 'sent_request'):
-                sent_list = user.iv.sent_request.all()
+                sent_list = user.iv.sent_request.filter(
+                    declined_on__isnull=True, canceled_on__isnull=True)
                 request_list.extend(sent_list)
             serializer = FriendRequestSerializer(
                 request_list, many=True, context={'user': user})
@@ -241,14 +271,14 @@ class FriendView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT, data="No friend")
 
 
-class FriendCreateView(APIView):
+class FriendRequestView(APIView):
     """
-        친구 요청
+        친구 요청 생성/수락/거절/취소
 
         ---
     """
     permission_classes = [IsAuthenticated]
-    @swagger_auto_schema(request_body=SendFriendRequestSerialzier, responses={201: 'successfully requested'})
+    @swagger_auto_schema(request_body=SendFriendRequestSerialzier, responses={400: 'aleady exists', 201: 'successfully requested'})
     def post(self, request, *args, **kwargs):
         phoneno = request.data['phoneno']
         user = request.user
@@ -259,9 +289,39 @@ class FriendCreateView(APIView):
         except ObjectDoesNotExist:
             requestee_iv = IdentityVerification(phoneno=phoneno)
             requestee_iv.save()
-        friend_request = FriendRequest(
-            requestor=requestor_iv,
-            requestee=requestee_iv
-        )
-        friend_request.save()
-        return Response(status=status.HTTP_201_CREATED, data="successfully requested")
+        try:
+            try:
+                veri = requestor_iv.received_request.get(
+                    requestor=requestee_iv)
+            except ObjectDoesNotExist:
+                raise IntegrityError
+            friend_request = FriendRequest(
+                requestor=requestor_iv,
+                requestee=requestee_iv
+            )
+            friend_request.save()
+            return Response(status=status.HTTP_201_CREATED, data="successfully requested")
+        except IntegrityError:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="aleady exists")
+
+    @swagger_auto_schema(request_body=FriendRequestPatchSerializer, responses={400: 'Bad Request', 201: 'successfully requested'})
+    def patch(self, request, *args, **wargs):
+        user = request.user
+        fr = FriendRequest.objects.get(id=request.data['id'])
+        action = request.data['action']
+
+        if action == 'APPROVE':
+            fr.approved_on = datetime.datetime.now()
+            fr.save()
+            return Response(status=status.HTTP_202_ACCEPTED, data="successfully approved")
+        elif action == 'DELETE':
+            fr.declined_on = datetime.datetime.now()
+            fr.save()
+            return Response(status=status.HTTP_202_ACCEPTED, data="successfully deleted")
+        elif action == 'CANCEL':
+            fr.canceled_on = datetime.datetime.now()
+            fr.save()
+            return Response(status=status.HTTP_202_ACCEPTED, data="successfully canceled")
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="action must be APPROVE or DELETE or CANCEL")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")

@@ -11,6 +11,10 @@ class FriendRequest(models.Model):
     requested_on = models.DateTimeField(auto_now_add=True)
     approved_on = models.DateTimeField(blank=True, null=True)
     declined_on = models.DateTimeField(blank=True, null=True)
+    canceled_on = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        unique_together = ('requestee', 'requestor')
 
     def __str__(self):
         requestee_disp = ''
@@ -71,6 +75,7 @@ class Like(models.Model):
         User, on_delete=models.CASCADE, related_name='like')
     feed = models.ForeignKey(
         Feed, on_delete=models.CASCADE, related_name='like')
+    value = models.BooleanField(default=True)
     is_unread = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

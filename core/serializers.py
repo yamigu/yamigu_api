@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, Serializer
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, Serializer, IntegerField, CharField
 from django.db import models
 from .models import *
 from authorization.serializers import ProfileSerializer
@@ -23,12 +23,14 @@ class FeedSerializer(ModelSerializer):
 
     class Meta:
         model = Feed
-        fields = ('img_src', 'created_at')
+        fields = ('id', 'img_src', 'created_at')
 
 
 class FeedListSerializer(ModelSerializer):
     profile = SerializerMethodField('get_profile')
     feed_list = SerializerMethodField('get_feed_list')
+    liked = SerializerMethodField('check_if_liked')
+
     @swagger_serializer_method(serializer_or_field=ProfileSerializer)
     def get_profile(self, user):
         return ProfileSerializer(user).data
@@ -38,9 +40,14 @@ class FeedListSerializer(ModelSerializer):
         feed_for_user = user.feed.all()
         return FeedSerializer(feed_for_user, many=True).data
 
+    def check_if_liked(self, user):
+        return hasattr(user, 'feed') \
+            and hasattr(user.feed, 'like') \
+            and feed.like.user == user
+
     class Meta:
         model = User
-        fields = ('profile', 'feed_list')
+        fields = ('profile', 'liked', 'feed_list')
 
 
 class FeedCreateSerializer(ModelSerializer):
@@ -54,8 +61,8 @@ class FeedCreateSerializer(ModelSerializer):
 class LikeSerializer(ModelSerializer):
     class Meta:
         model = Like
-        fields = '__all__'
-        read_only_fields = ('user', 'is_unread', 'created_at')
+        fields = ('user', 'value', 'is_unread', 'created_at')
+        read_only_fields = ('user', 'value', 'is_unread', 'created_at')
 
 
 class SendFriendRequestSerialzier(ModelSerializer):
@@ -99,4 +106,10 @@ class FriendRequestSerializer(ModelSerializer):
 
     class Meta:
         model = FriendRequest
-        fields = ('approved', 'you_sent', 'phoneno', 'user_info')
+        fields = ('id', 'approved', 'you_sent', 'phoneno', 'user_info')
+        read_only_fields = ('id', 'approved', 'you_sent', 'user_info')
+
+
+class FriendRequestPatchSerializer(Serializer):
+    id = IntegerField(help_text='FriendRequest\'s ID')
+    action = CharField(help_text='APPROVE or DELETE or CANCEL')

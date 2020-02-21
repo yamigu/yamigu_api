@@ -10,8 +10,9 @@ urlpatterns = [
     path('feed/', FeedCreateView.as_view()),
     path('shield/', ShieldView.as_view()),
     path('like/<fid>/', LikeView.as_view()),
+    path('like/<fid>/cancel/', LikeCancelView.as_view()),
     path('friends/', FriendView.as_view()),
     path('friends/<uid>/', FriendView.as_view()),
-    path('friend/', FriendCreateView.as_view()),
+    path('friend/', FriendRequestView.as_view()),
     path('both_like/', BothLikeView.as_view()),
 ]
