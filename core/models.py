@@ -45,6 +45,7 @@ class Shield(models.Model):
 class MatchRequest(models.Model):
     STATUS_CODE_MATCHING = 1
     STATUS_CODE_MATCHED = 2
+    STATUS_CODE_CANCELED = 3
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='match_request')
     personnel_selected = models.SmallIntegerField(default=0)

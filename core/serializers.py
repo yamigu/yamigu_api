@@ -10,7 +10,8 @@ class MatchRequestSerializer(ModelSerializer):
     class Meta:
         model = MatchRequest
         fields = "__all__"
-        read_only_fields = ('status', 'matched_on')
+        read_only_fields = ('matched_on',)
+        extra_kwargs = {'status': {'required': False}}
 
 
 class FeedSerializer(ModelSerializer):
