@@ -233,17 +233,19 @@ class BothLikeView(APIView):
         if(hasattr(user, 'like')):
             user_like_feed_list = user.like.all()
             for like in user_like_feed_list:
-                user_like.append(like.feed.user.uid)
+                user_like.append(like.feed.user)
             user_like_set = set(user_like)
         if(hasattr(user, 'feed')):
             feed_list_of_user = user.feed.all()
             for feed in feed_list_of_user:
                 like_feed_user_list = feed.like.all()
                 for like in like_feed_user_list:
-                    like_user.append(like.user.uid)
+                    like_user.append(like.user)
             like_user_set = set(like_user)
-        data = {'user_list': user_like_set & like_user_set}
-        return Response(status=status.HTTP_200_OK, data=data)
+        serializer = ProfileSerializer(
+            user_like_set & like_user_set, many=True)
+
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 class FriendView(APIView):
