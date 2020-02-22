@@ -57,7 +57,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=100, null=True, unique=True)
     nickname = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(max_length=70, blank=True)
-    is_student = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -85,6 +84,7 @@ class ProfileImage(models.Model):
 class BelongVerification(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='bv')
+    is_student = models.BooleanField(default=True)
     belong = models.CharField(max_length=255)
     department = models.CharField(max_length=255)
 

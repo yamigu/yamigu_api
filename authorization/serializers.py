@@ -56,7 +56,7 @@ class BelongVerificationSerializer(ModelSerializer):
 
     class Meta:
         model = BelongVerification
-        fields = ('belong', 'department', 'verified', 'image')
+        fields = ('is_student', 'belong', 'department', 'verified', 'image')
         extra_kwargs = {'image': {'required': False}}
 
 

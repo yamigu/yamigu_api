@@ -124,8 +124,8 @@ class FeedCreateView(APIView):
         )
         feed_image.save()
         rotate_image(get_file_path(file_name, TAG))
-
-        return Response(status=status.HTTP_200_OK, data="successfully created")
+        serializer = FeedSerializer(feed)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
 class ShieldView(APIView):
