@@ -13,6 +13,7 @@ class UserSerializer(ModelSerializer):
 
 class ProfileSerializer(ModelSerializer):
     birthdate = SerializerMethodField('get_birthdate')
+    gender = SerializerMethodField('get_gender')
     belong = SerializerMethodField('get_belong')
     department = SerializerMethodField('get_department')
     avata = SerializerMethodField('get_avata')
@@ -20,6 +21,11 @@ class ProfileSerializer(ModelSerializer):
     def get_birthdate(self, user):
         if(hasattr(user, 'iv')):
             return user.iv.birthdate
+        return None
+
+    def get_gender(self, user):
+        if(hasattr(user, 'iv')):
+            return user.iv.gender
         return None
 
     def get_belong(self, user):
@@ -40,7 +46,7 @@ class ProfileSerializer(ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('uid', 'nickname', 'birthdate',
+        fields = ('uid', 'nickname', 'birthdate', 'gender',
                   'belong', 'department', 'avata')
 
 
