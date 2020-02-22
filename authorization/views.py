@@ -99,7 +99,10 @@ class ProfileImageView(APIView):
             )
         profile_image.save()
         rotate_image(get_file_path(file_name, TAG))
-        return Response(status=status.HTTP_200_OK, data="successfully updated")
+        serializer = ImageSerializer(image)
+        data = serializer.data
+        data['number'] = number
+        return Response(status=status.HTTP_200_OK, data=data)
 
 
 class BelongVerificationView(APIView):
