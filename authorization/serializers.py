@@ -17,6 +17,7 @@ class ProfileSerializer(ModelSerializer):
     belong = SerializerMethodField('get_belong')
     department = SerializerMethodField('get_department')
     avata = SerializerMethodField('get_avata')
+    verified = SerializerMethodField('get_verified')
 
     def get_birthdate(self, user):
         if(hasattr(user, 'iv')):
@@ -44,10 +45,18 @@ class ProfileSerializer(ModelSerializer):
                 return ImageSerializer(user.image.last().data).data['src']
         return None
 
+    def get_verified(self, user):
+        if(hasattr(user, 'bv')):
+            if(hasattr(user.bv, 'image')):
+                if(user.bv.verified):
+                    return 2
+                return 1
+        return 0
+
     class Meta:
         model = get_user_model()
         fields = ('uid', 'nickname', 'birthdate', 'gender',
-                  'belong', 'department', 'avata')
+                  'belong', 'department', 'avata', 'verified')
 
 
 class BVImageSerializer(ModelSerializer):
