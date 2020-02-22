@@ -48,7 +48,7 @@ class ProfileSerializer(ModelSerializer):
     def get_verified(self, user):
         if(hasattr(user, 'bv')):
             if(hasattr(user.bv, 'image')):
-                if(user.bv.verified):
+                if(user.bv.image.last().is_checked):
                     return 2
                 return 1
         return 0
