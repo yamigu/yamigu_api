@@ -306,8 +306,8 @@ class FriendRequestView(APIView):
             try:
                 veri = requestor_iv.received_request.get(
                     requestor=requestee_iv)
-            except ObjectDoesNotExist:
-                raise IntegrityError
+                if veri is not None:
+                    raise IntegrityError
             friend_request = FriendRequest(
                 requestor=requestor_iv,
                 requestee=requestee_iv
