@@ -303,10 +303,13 @@ class FriendRequestView(APIView):
             requestee_iv = IdentityVerification(phoneno=phoneno)
             requestee_iv.save()
         try:
-            veri = requestor_iv.received_request.get(
-                requestor=requestee_iv)
-            if veri is not None:
-                raise IntegrityError
+            try:
+                veri = requestor_iv.received_request.get(
+                    requestor=requestee_iv)
+                if veri is not None:
+                    raise IntegrityError
+            except ObjectDoesNotExist:
+                pass
             friend_request = FriendRequest(
                 requestor=requestor_iv,
                 requestee=requestee_iv
