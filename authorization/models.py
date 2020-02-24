@@ -63,7 +63,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     hide_department = models.BooleanField(default=False)
     num_of_yami = models.IntegerField(default=0)
     num_of_free = models.IntegerField(default=0)
+    something_with = models.ManyToManyField("self")
     created_at = models.DateTimeField(auto_now_add=True)
+
     token = Token
     firebase_token = models.CharField(
         max_length=1000, blank=True, null=True, unique=True)

@@ -183,7 +183,7 @@ class LikeView(APIView):
         serializer = LikeSerializer(likes, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
-    @swagger_auto_schema(responses={201: 'successfully created'})
+    @swagger_auto_schema(responses={201: 'successfully created', 208: ProfileSerializer})
     def post(self, request, *args, **kwargs):
         feed = Feed.objects.get(id=kwargs.get('fid'))
         user = request.user
@@ -195,6 +195,17 @@ class LikeView(APIView):
         except ObjectDoesNotExist:
             like = Like(user=user, feed=feed)
             like.save()
+        target_like_users = []
+        for target_like in feed.user.like.all():
+            if (target_like.value):
+                target_like_users.append(target_like.feed.user)
+
+        if user in target_like_users:
+            user.something_with.add(feed.user)
+            user.save()
+            serializer = ProfileSerializer(feed.user)
+            return Response(status=status.HTTP_208_ALREADY_REPORTED, data=serializer.data)
+
         return Response(status=status.HTTP_201_CREATED, data="successfully created")
 
 
@@ -214,6 +225,8 @@ class LikeCancelView(APIView):
             like.value = False
             like.created_at = datetime.datetime.now()
             like.save()
+            user.something_with.remove(feed.user)
+            user.save()
             return Response(status=status.HTTP_200_OK, data="successfully updated")
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
@@ -225,30 +238,11 @@ class BothLikeView(APIView):
         ---
     """
     permission_classes = [IsAuthenticated]
-
+    @swagger_auto_schema(responses={200: ProfileSerializer})
     def get(self, request, *args, **kwargs):
         user = request.user
-        user_like = []
-        like_user = []
-        user_like_set = {}
-        like_user_set = {}
-        print(user.nickname)
-        if(hasattr(user, 'like')):
-            user_like_feed_list = user.like.all()
-            for like in user_like_feed_list:
-                user_like.append(like.feed.user)
-            print(user_like)
-            user_like_set = set(user_like)
-        if(hasattr(user, 'feed')):
-            feed_list_of_user = user.feed.all()
-            for feed in feed_list_of_user:
-                like_feed_user_list = feed.like.all()
-                for like in like_feed_user_list:
-                    like_user.append(like.user)
-            like_user_set = set(like_user)
-        serializer = ProfileSerializer(
-            user_like_set & like_user_set, many=True)
-
+        somethings = user.something_with.all()
+        serializer = ProfileSerializer(somethings, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
