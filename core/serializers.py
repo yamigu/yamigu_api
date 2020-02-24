@@ -42,9 +42,14 @@ class FeedListSerializer(ModelSerializer):
         return FeedSerializer(feed_for_user, many=True).data
 
     def check_if_liked(self, user):
-        return hasattr(user, 'feed') \
-            and hasattr(user.feed, 'like') \
-            and feed.like.user == user
+        me = self.context.get("user")
+        if hasattr(user, 'feed'):
+            if user.feed.count() > 0:
+                likes = user.feed.last().like.all()
+                for like in likes:
+                    if like.user.id == me.id:
+                        return True
+        return False
 
     class Meta:
         model = User

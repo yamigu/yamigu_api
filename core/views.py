@@ -73,8 +73,10 @@ class FeedListView(APIView):
 
     @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
+        user = request.user
         users = User.objects.all()
-        serializer = FeedListSerializer(users, many=True)
+        serializer = FeedListSerializer(
+            users, many=True, context={'user': user})
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
@@ -185,7 +187,7 @@ class LikeView(APIView):
     def post(self, request, *args, **kwargs):
         feed = Feed.objects.get(id=kwargs.get('fid'))
         user = request.user
-        try: 
+        try:
             like = feed.like.get(user=user.id)
             like.value = True
             like.created_at = datetime.datetime.now()
@@ -230,10 +232,12 @@ class BothLikeView(APIView):
         like_user = []
         user_like_set = {}
         like_user_set = {}
+        print(user.nickname)
         if(hasattr(user, 'like')):
             user_like_feed_list = user.like.all()
             for like in user_like_feed_list:
                 user_like.append(like.feed.user)
+            print(user_like)
             user_like_set = set(user_like)
         if(hasattr(user, 'feed')):
             feed_list_of_user = user.feed.all()
