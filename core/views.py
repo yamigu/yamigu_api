@@ -185,13 +185,12 @@ class LikeView(APIView):
     def post(self, request, *args, **kwargs):
         feed = Feed.objects.get(id=kwargs.get('fid'))
         user = request.user
-        like = feed.like.filter(user=user.id)
-        if like.count() > 0:
-            like = like.last()
+        try: 
+            like = feed.like.get(user=user.id)
             like.value = True
             like.created_at = datetime.datetime.now()
             like.save()
-        else:
+        except ObjectDoesNotExist:
             like = Like(user=user, feed=feed)
             like.save()
         return Response(status=status.HTTP_201_CREATED, data="successfully created")
