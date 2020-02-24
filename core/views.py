@@ -185,8 +185,9 @@ class LikeView(APIView):
     def post(self, request, *args, **kwargs):
         feed = Feed.objects.get(id=kwargs.get('fid'))
         user = request.user
-        like = feed.like.get(user=user.id)
-        if like is not None:
+        like = feed.like.filter(user=user.id)
+        if like.count() > 0:
+            like = like.last()
             like.value = True
             like.created_at = datetime.datetime.now()
             like.save()
