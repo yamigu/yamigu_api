@@ -47,7 +47,7 @@ class FeedListSerializer(ModelSerializer):
             if user.feed.count() > 0:
                 likes = user.feed.last().like.all()
                 for like in likes:
-                    if like.user.id == me.id:
+                    if like.user.id == me.id and like.value:
                         return True
         return False
 
