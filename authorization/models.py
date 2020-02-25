@@ -67,8 +67,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
 
     token = Token
-    firebase_token = models.CharField(
-        max_length=1000, blank=True, null=True, unique=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'

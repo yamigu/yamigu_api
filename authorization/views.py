@@ -15,6 +15,29 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from drf_yasg.utils import swagger_auto_schema
 
+import firebase_admin
+from firebase_admin import auth
+from firebase_admin._auth_utils import UserNotFoundError
+
+
+def create_token_uid(uid):
+
+    # [START create_token_uid]
+
+    custom_token = auth.create_custom_token(uid)
+    custom_token = custom_token.decode('utf-8')
+    # [END create_token_uid]
+    return custom_token
+
+
+class FireBaseAuthView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        firebase_token = create_token_uid(user.uid)
+        return Response(status=status.HTTP_200_OK, data=firebase_token)
+
 
 class UserInfoView(APIView):
     """

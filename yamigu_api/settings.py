@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
+import firebase_admin
+from firebase_admin import auth, credentials
 import os
 
 # Build paths inside t  he project like this: os.path.join(BASE_DIR, ...)
@@ -170,3 +172,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+cred = firebase_admin.credentials.Certificate(
+    os.path.join(BASE_DIR, 'credentials.json'))
+default_app = firebase_admin.initialize_app(cred)
