@@ -53,6 +53,8 @@ class MatchRequest(models.Model):
     min_age = models.SmallIntegerField(default=20)
     max_age = models.SmallIntegerField(default=30)
     requested_on = models.DateTimeField(auto_now_add=True, blank=True)
+    matched_with = models.OneToOneField(
+        "self", on_delete=models.SET_NULL, related_name="+", null=True, blank=True)
     matched_on = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0)
 
