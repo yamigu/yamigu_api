@@ -141,6 +141,7 @@ class BelongVerificationView(APIView):
             data = {
                 'belong': request.data['belong'],
                 'department': request.data['department'],
+                'is_student': request.data['is_student'],
             }
             serializer = BelongVerificationSerializer(user.bv, data=data)
             if serializer.is_valid():
