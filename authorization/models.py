@@ -108,3 +108,10 @@ class IdentityVerification(models.Model):
     gender = models.IntegerField(blank=True, null=True)
     phoneno = models.CharField(max_length=14, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class FirebaseToken(models.Model):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="firebase_token")
+    value = models.CharField(max_length=1000)
+    issued_on = models.DateTimeField()

@@ -35,8 +35,22 @@ class FireBaseAuthView(APIView):
 
     def get(self, request, *args, **kwargs):
         user = request.user
-        firebase_token = create_token_uid(user.uid)
-        return Response(status=status.HTTP_200_OK, data=firebase_token)
+
+        if hasattr(user, 'firebase_token'):
+            firebase_token = user.firebase_token
+            if not (datetime.now() - firebase_token.issued_on.replace(tzinfo=None)).seconds > 3500:
+                firebase_token.value = create_token_uid(user.uid)
+                firebase_token.issued_on = datetime.now()
+                firebase_token.save()
+            return Response(status=status.HTTP_200_OK, data=firebase_token.value)
+        else:
+            firebase_token = FirebaseToken(
+                user=user,
+                value=create_token_uid(user.uid),
+                issued_on=datetime.now()
+            )
+            firebase_token.save()
+            return Response(status=status.HTTP_200_OK, data=firebase_token.value)
 
 
 class UserInfoView(APIView):
@@ -212,6 +226,23 @@ class IdentityVerificationView(APIView):
             serializer.save()
             return Response(status=status.HTTP_200_OK, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+
+
+class YamiView(APIView):
+    """
+        야미 갯수 정보
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            return Response(status=status.HTTP_200_OK, data=user.num_of_yami)
+        except:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Unknown Error")
 
 
 class KakaoLoginView(SocialLoginView):
