@@ -14,4 +14,5 @@ urlpatterns = [
     path('user/signup/', SignupView.as_view()),
     path('user/belong_verification/', BelongVerificationView.as_view()),
     path('user/identity_verification/', IdentityVerificationView.as_view()),
+    path('user/yami/', YamiView.as_view()),
 ]
