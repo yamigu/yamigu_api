@@ -70,14 +70,21 @@ class BelongVerificationSerializer(ModelSerializer):
 
     verified = SerializerMethodField(
         'get_verified', read_only=True, required=False)
+    image = SerializerMethodField('get_image')
 
-    def get_verified(self, user):
-        if(hasattr(user, 'bv')):
-            if(hasattr(user.bv, 'image')):
-                if(user.bv.image.count() > 0):
-                    if(user.bv.image.last().is_checked):
-                        return 2
-                    return 1
+    def get_image(self, bv):
+        if(hasattr(bv, 'image')):
+            if(bv.image.count() > 0):
+                serializer = ImageSerializer(bv.image.last().data)
+                return serializer.data
+        return None
+
+    def get_verified(self, bv):
+        if(hasattr(bv, 'image')):
+            if(bv.image.count() > 0):
+                if(bv.image.last().is_checked):
+                    return 2
+                return 1
         return 0
 
     class Meta:
