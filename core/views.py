@@ -338,3 +338,35 @@ class FriendRequestView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data="action must be APPROVE or DELETE or CANCEL")
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+
+class ChatView(APIView):
+    """
+        채팅
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(responses={200: ChatListSerializer, 400: 'Bad Request'})
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            serializer = ChatListSerializer(user)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+    @swagger_auto_schema(request_body=ChatSerializer, responses={400: 'Bad Request', 201: 'successfully requested'})
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        target = User.objects.get(uid=request.data['target_uid'])
+        data = {
+            'sender': user.id,
+            'receiver': target.id
+        }
+        serializer = ChatSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED, data="successfully requested")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)

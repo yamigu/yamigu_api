@@ -26,7 +26,7 @@ class OrderValidateAndroidView(APIView):
         payload = json.loads(request.data['payload'])
         product_id = payload['productId']
         purchase_token = payload['purchaseToken']
-        signature_android = payload['signatureAndroid']
+        transaction_id = payload['transactionId']
         # credentials = SignedJwtAssertionCredentials(
         #     service,
         #     key_content,
@@ -44,11 +44,17 @@ class OrderValidateAndroidView(APIView):
             product = service.purchases().products().get(packageName='com.yamigu.yamigu_app', productId=product_id,
                                                          token=purchase_token, key='AIzaSyBZDdvFbyJb2zVDn1J4YipPDW6AxbgZh5o').execute(http=http)
             result = product.execute()
+            order = Order(
+                user=user,
+                product_id=product_id,
+                transaction_id=transaction_id,
+            )
+            order.save()
             return Response(status=status.HTTP_200_OK, data=result)
         except Exception as e:
-            return Response(status=status.HTTP_200_OK, data=None)
+            # return Response(status=status.HTTP_200_OK, data=None)
 
-            # return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

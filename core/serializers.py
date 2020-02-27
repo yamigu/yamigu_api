@@ -119,3 +119,28 @@ class FriendRequestSerializer(ModelSerializer):
 class FriendRequestPatchSerializer(Serializer):
     id = IntegerField(help_text='FriendRequest\'s ID')
     action = CharField(help_text='APPROVE or DELETE or CANCEL')
+
+
+class ChatSerializer(ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = '__all__'
+        read_only_fields = ('created_at', 'declined_on',
+                            'canceled_on', 'approved_on')
+
+
+class ChatListSerializer(ModelSerializer):
+    chat_list = SerializerMethodField('get_chat_list')
+
+    @swagger_serializer_method(serializer_or_field=ChatSerializer)
+    def get_chat_list(self, user):
+        print(user)
+        chat_sent = user.chat_sent.all()
+        chat_recv = user.chat_recv.all()
+        data = chat_sent | chat_recv
+        serializer = ChatSerializer(data, many=True)
+        return serializer.data
+
+    class Meta:
+        model = User
+        fields = ('chat_list', )
