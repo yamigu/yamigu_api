@@ -67,13 +67,22 @@ class BVImageSerializer(ModelSerializer):
 
 
 class BelongVerificationSerializer(ModelSerializer):
-    verified = BooleanField(source='image.is_checked',
-                            read_only=True, required=False)
+
+    verified = SerializerMethodField(
+        'get_verified', read_only=True, required=False)
+
+    def get_verified(self, user):
+        if(hasattr(user, 'bv')):
+            if(hasattr(user.bv, 'image')):
+                if(user.bv.image.count() > 0):
+                    if(user.bv.image.last().is_checked):
+                        return 2
+                    return 1
+        return 0
 
     class Meta:
         model = BelongVerification
-        fields = ('is_student', 'belong', 'department',
-                  'is_student', 'verified', 'image')
+        fields = ('is_student', 'belong', 'department', 'verified', 'image')
         extra_kwargs = {'image': {'required': False}}
 
 

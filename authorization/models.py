@@ -113,5 +113,5 @@ class IdentityVerification(models.Model):
 class FirebaseToken(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="firebase_token")
-    value = models.CharField(max_length=1000)
+    value = models.CharField(max_length=2048)
     issued_on = models.DateTimeField()

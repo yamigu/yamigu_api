@@ -3,6 +3,7 @@ from django.urls import path, include
 from authorization.urls import urlpatterns as auth_url_patterns
 from core.urls import urlpatterns as core_url_patterns
 from deploy.urls import urlpatterns as deploy_url_patterns
+from purchase.urls import urlpatterns as purchase_url_patterns
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from django.conf import settings
@@ -24,6 +25,7 @@ urlpatterns = [
     path('authorization/', include(auth_url_patterns)),
     path('core/', include(core_url_patterns)),
     path('deploy/', include(deploy_url_patterns)),
+    path('purchase/', include(purchase_url_patterns)),
     path('docs/', schema_view.with_ui('redoc',
                                       cache_timeout=0), name='schema-swagger-ui'),
 ]
