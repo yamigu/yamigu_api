@@ -38,7 +38,7 @@ class FireBaseAuthView(APIView):
 
         if hasattr(user, 'firebase_token'):
             firebase_token = user.firebase_token
-            if not (datetime.now() - firebase_token.issued_on.replace(tzinfo=None)).seconds > 3500:
+            if (datetime.now() - firebase_token.issued_on.replace(tzinfo=None)).seconds > 3500:
                 firebase_token.value = create_token_uid(user.uid)
                 firebase_token.issued_on = datetime.now()
                 firebase_token.save()

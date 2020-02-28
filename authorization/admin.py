@@ -5,6 +5,7 @@ admin.site.register(ProfileImage)
 admin.site.register(IdentityVerification)
 admin.site.register(BelongVerification)
 admin.site.register(BVImage)
+admin.site.register(FirebaseToken)
 # class UserAdmin(admin.ModelAdmin):
 #     list_filter = ('is_certified',)
 #     list_display = ('id', 'uid', 'nickname', 'birth', 'gender_string', 'real_name', 'is_certified_string', 'yami')
