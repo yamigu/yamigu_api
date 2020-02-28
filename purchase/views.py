@@ -15,6 +15,8 @@ import json
 import os
 import re
 import itunesiap
+
+from .models import *
 # Create your views here.
 
 
@@ -27,22 +29,17 @@ class OrderValidateAndroidView(APIView):
         product_id = payload['productId']
         purchase_token = payload['purchaseToken']
         transaction_id = payload['transactionId']
-        # credentials = SignedJwtAssertionCredentials(
-        #     service,
-        #     key_content,
-        #     scope='https://www.googleapis.com/auth/androidpublisher')
         scopes = ['https://www.googleapis.com/auth/androidpublisher']
 
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
             settings.GOOGLE_KEY_STORE, scopes)
-
         try:
             http = httplib2.Http()
             http_auth = credentials.authorize(http)
-            service = build('androidpublisher', 'v2',
+            service = build('androidpublisher', 'v3',
                             http=http_auth)
             product = service.purchases().products().get(packageName='com.yamigu.yamigu_app', productId=product_id,
-                                                         token=purchase_token, key='AIzaSyBZDdvFbyJb2zVDn1J4YipPDW6AxbgZh5o').execute(http=http)
+                                                         token=purchase_token)
             result = product.execute()
             order = Order(
                 user=user,
@@ -52,8 +49,6 @@ class OrderValidateAndroidView(APIView):
             order.save()
             return Response(status=status.HTTP_200_OK, data=result)
         except Exception as e:
-            # return Response(status=status.HTTP_200_OK, data=None)
-
             return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
 
         return Response(status=status.HTTP_400_BAD_REQUEST)

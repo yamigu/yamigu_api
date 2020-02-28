@@ -179,4 +179,4 @@ cred = firebase_admin.credentials.Certificate(
 default_app = firebase_admin.initialize_app(cred)
 
 GOOGLE_KEY_STORE = os.path.join(
-    BASE_DIR, "keys") + '/api-7596831323571844011-92784-2db0038f00d5.json'
+    BASE_DIR, "keys") + '/api-7596831323571844011-92784-e6fdb9161dce.json'

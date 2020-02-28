@@ -121,11 +121,29 @@ class FriendRequestPatchSerializer(Serializer):
     action = CharField(help_text='APPROVE or DELETE or CANCEL')
 
 
+class ChatCreateSerializer(Serializer):
+    target_uid = CharField(help_text='Partner\'s UID')
+
+
 class ChatSerializer(ModelSerializer):
+    sender = SerializerMethodField('get_sender')
+    receiver = SerializerMethodField('get_receiver')
+
+    @swagger_serializer_method(serializer_or_field=ProfileSerializer)
+    def get_sender(self, chat):
+        serializer = ProfileSerializer(chat.sender)
+        return serializer.data
+
+    @swagger_serializer_method(serializer_or_field=ProfileSerializer)
+    def get_receiver(self, chat):
+        serializer = ProfileSerializer(chat.receiver)
+        return serializer.data
+
     class Meta:
         model = Chat
-        fields = '__all__'
-        read_only_fields = ('created_at', 'declined_on',
+        fields = ('id', 'sender', 'receiver', 'created_at',
+                  'declined_on', 'canceled_on', 'approved_on')
+        read_only_fields = ('id', 'sender', 'receiver', 'created_at', 'declined_on',
                             'canceled_on', 'approved_on')
 
 
