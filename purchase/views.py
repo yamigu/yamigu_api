@@ -19,6 +19,13 @@ import itunesiap
 from .models import *
 # Create your views here.
 
+products = {
+    'yami_10': 10,
+    'yami_30': 30,
+    'yami_50': 50,
+    'yami_100': 100,
+}
+
 
 class OrderValidateAndroidView(APIView):
     permission_classes = [IsAuthenticated]
@@ -47,6 +54,8 @@ class OrderValidateAndroidView(APIView):
                 transaction_id=transaction_id,
             )
             order.save()
+            user.num_of_yami = user.num_of_yami + products[product_id]
+            user.save()
             return Response(status=status.HTTP_200_OK, data=result)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
