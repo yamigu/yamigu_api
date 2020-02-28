@@ -127,6 +127,7 @@ class Chat(models.Model):
         User, on_delete=models.SET_NULL, related_name='chat_sent', null=True)
     receiver = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name='chat_recv', null=True)
+    chat_type = models.SmallIntegerField(default=0)
     approved_on = models.DateTimeField(null=True, blank=True)
     declined_on = models.DateTimeField(null=True, blank=True)
     canceled_on = models.DateTimeField(null=True, blank=True)

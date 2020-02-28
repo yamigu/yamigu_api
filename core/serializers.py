@@ -141,9 +141,9 @@ class ChatSerializer(ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('id', 'sender', 'receiver', 'created_at',
+        fields = ('id', 'sender', 'receiver', 'created_at', 'chat_type',
                   'declined_on', 'canceled_on', 'approved_on')
-        read_only_fields = ('id', 'sender', 'receiver', 'created_at', 'declined_on',
+        read_only_fields = ('id', 'sender', 'receiver', 'chat_type', 'created_at', 'declined_on',
                             'canceled_on', 'approved_on')
 
 
@@ -152,7 +152,6 @@ class ChatListSerializer(ModelSerializer):
 
     @swagger_serializer_method(serializer_or_field=ChatSerializer)
     def get_chat_list(self, user):
-        print(user)
         chat_sent = user.chat_sent.all()
         chat_recv = user.chat_recv.all()
         data = chat_sent | chat_recv
