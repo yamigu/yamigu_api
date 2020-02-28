@@ -56,7 +56,7 @@ class OrderValidateAndroidView(APIView):
             order.save()
             user.num_of_yami = user.num_of_yami + products[product_id]
             user.save()
-            return Response(status=status.HTTP_200_OK, data=result)
+            return Response(status=status.HTTP_200_OK, data=user.num_of_yami)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
 
