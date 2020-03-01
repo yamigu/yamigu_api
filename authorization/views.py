@@ -86,9 +86,11 @@ class SignupView(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         user.nickname = request.data['nickname']
+        user.location = Location.objects.get(name=request.data['location'])
         user.bv.is_student = True if request.data['is_student'] == 'true' else False
         user.bv.belong = request.data['belong']
         user.bv.department = request.data['department']
+
         user.bv.save()
         user.save()
 
