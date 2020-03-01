@@ -180,3 +180,18 @@ class ShieldSerializer(ModelSerializer):
     class Meta:
         model = Shield
         fields = '__all__'
+
+
+class ReportSerializer(ModelSerializer):
+    class Meta:
+        model = Report
+        fields = '__all__'
+
+
+class ReportCreateSerializer(Serializer):
+    who = CharField(help_text="신고할 대상 유저의 uid", required=True)
+    why = CharField(help_text="신고 이유", required=True)
+
+
+class BlockCreateSerializer(Serializer):
+    who = CharField(help_text="차단할 대상 유저의 uid", required=True)

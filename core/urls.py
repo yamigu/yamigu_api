@@ -18,4 +18,5 @@ urlpatterns = [
     path('both_like/', BothLikeView.as_view()),
     path('chat/', ChatView.as_view()),
     path('shield/', ShieldView.as_view()),
+    path('report/', ReportView.as_view()),
 ]

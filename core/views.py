@@ -77,7 +77,10 @@ class FeedListView(APIView):
         users = User.objects.all().exclude(id=user.id)  # exclude me
         users = users.exclude(nickname__isnull=True)  # exclude no Nickname
         users = users.exclude(iv__isnull=True)  # exclude no IV
-
+        blocked_id = []
+        for blocked in user.disconnected_with.all():
+            blocked_id.append(blocked.id)
+        users = users.exclude(id__in=blocked_id)
         shields = user.shield.all()
 
         if shields.count() > 0:
@@ -403,6 +406,7 @@ class ShieldView(APIView):
 
         ---
     """
+    permission_classes = [IsAuthenticated]
     @swagger_auto_schema(request_body=ShieldCreateSerializer, responses={400: 'Bad Request', 201: 'successfully created'})
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -483,4 +487,50 @@ class ShieldView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+
+class ReportView(APIView):
+    """
+        신고
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(request_body=ReportCreateSerializer, responses={400: 'Bad Request', 201: 'successfully reported'})
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        who = User.objects.get(uid=request.data['who'])
+        why = request.data['why']
+        data = {
+            'user': user.id,
+            'who': who.id,
+            'why': why
+        }
+        serializer = ReportSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            user.disconnected_with.add(who)
+            user.save()
+            return Response(status=status.HTTP_201_CREATED, data="successfully reported")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+
+
+class BlockView(APIView):
+    """
+        차단
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(request_body=BlockCreateSerializer, responses={400: 'Bad Request', 200: 'successfully blocked'})
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            who = User.objects.get(uid=request.data['who'])
+            user.disconnected_with.add(who)
+            user.save()
+            return Response(status=status.HTTP_200_OK, data="successfully blocked")
+        except:
+            pass
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")

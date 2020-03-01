@@ -42,6 +42,15 @@ class Shield(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
+class Report(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='report')
+    who = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reported')
+    why = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
 class MatchRequest(models.Model):
     STATUS_CODE_MATCHING = 1
     STATUS_CODE_MATCHED = 2
