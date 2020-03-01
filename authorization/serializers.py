@@ -1,5 +1,5 @@
 # party/serializers.py
-from rest_framework.serializers import ModelSerializer, SerializerMethodField, StringRelatedField, BooleanField, ReadOnlyField
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, StringRelatedField, BooleanField, ReadOnlyField, CharField
 from django.contrib.auth import get_user_model
 from file_management.serializers import *
 from .models import *
@@ -18,6 +18,7 @@ class ProfileSerializer(ModelSerializer):
     department = SerializerMethodField('get_department')
     avata = SerializerMethodField('get_avata')
     verified = SerializerMethodField('get_verified')
+    location = CharField(source='location.name')
 
     def get_birthdate(self, user):
         if(hasattr(user, 'iv')):
@@ -57,7 +58,7 @@ class ProfileSerializer(ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('uid', 'nickname', 'birthdate', 'gender',
-                  'belong', 'department', 'avata', 'verified')
+                  'belong', 'department', 'avata', 'verified', 'location')
 
 
 class BVImageSerializer(ModelSerializer):
