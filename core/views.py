@@ -91,7 +91,7 @@ class FeedView(APIView):
     @swagger_auto_schema(responses={200: FeedSerializer()})
     def get(self, request, *args, **kwargs):
         user = User.objects.get(uid=kwargs.get('uid'))
-        serializer = FeedSerializer(user.feed.filter(
+        serializer = FeedSerializer(user.feed.all().filter(
             deleted_at__isnull=False), many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
