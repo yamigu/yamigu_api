@@ -74,7 +74,10 @@ class FeedListView(APIView):
     @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
         user = request.user
-        users = User.objects.all().exclude(id=user.id)
+        users = User.objects.all().exclude(id=user.id)  # exclude me
+        users = users.exclude(nickname__isnull=True)  # exclude no Nickname
+        users = users.exclude(iv__isnull=True)  # exclude no IV
+
         shields = user.shield.all()
 
         if shields.count() > 0:
