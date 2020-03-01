@@ -453,7 +453,7 @@ class ShieldView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
     @swagger_auto_schema(request_body=ShieldCreateSerializer, responses={400: 'Bad Request', 200: 'successfully deleted'})
-    def delete(self, request, *args, **kwargs):
+    def patch(self, request, *args, **kwargs):
         user = request.user
         phoneno = None
         belong = None
