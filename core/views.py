@@ -425,15 +425,18 @@ class ShieldView(APIView):
                 data = {
                     'user': user.id,
                     'phoneno': phone,
+                    'belong': '',
                 }
                 if user.shield.filter(phoneno=phone).count() == 0:
                     data_list.append(data)
         elif(belong is not None):
             data = {
                 'user': user.id,
+                'phoneno': '',
                 'belong': belong,
             }
-            data_list.append(data)
+            if user.shield.filter(belong=belong).count() == 0:
+                data_list.append(data)
         serializer = ShieldSerializer(data=data_list, many=True)
         if serializer.is_valid():
             serializer.save()

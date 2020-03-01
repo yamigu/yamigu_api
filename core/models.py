@@ -41,9 +41,6 @@ class Shield(models.Model):
     belong = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = (('user', 'phoneno'), ('user', 'belong'))
-
 
 class MatchRequest(models.Model):
     STATUS_CODE_MATCHING = 1
