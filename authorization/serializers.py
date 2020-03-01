@@ -18,7 +18,7 @@ class ProfileSerializer(ModelSerializer):
     department = SerializerMethodField('get_department')
     avata = SerializerMethodField('get_avata')
     verified = SerializerMethodField('get_verified')
-    location = CharField(source='location.name')
+    location = SerializerMethodField('get_location')
 
     def get_birthdate(self, user):
         if(hasattr(user, 'iv')):
@@ -54,6 +54,11 @@ class ProfileSerializer(ModelSerializer):
                         return 2
                     return 1
         return 0
+
+    def get_location(self, user):
+        if hasattr(user.location, 'name'):
+            return user.location.name
+        return None
 
     class Meta:
         model = get_user_model()
