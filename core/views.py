@@ -419,16 +419,23 @@ class ShieldView(APIView):
         if phoneno is None and belong is None:
             return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
         data_list = []
-        phoneno = list(set(phoneno))
-        for phone in phoneno:
+        if(phoneno is not None):
+            phoneno = list(set(phoneno))
+            for phone in phoneno:
+                data = {
+                    'user': user.id,
+                    'phoneno': phone,
+                    'belong': '',
+                }
+                if user.shield.filter(phoneno=phone).count() == 0:
+                    data_list.append(data)
+        elif(belong is not None):
             data = {
                 'user': user.id,
-                'phoneno': phone,
+                'phoneno': '',
                 'belong': belong,
             }
-            if user.shield.filter(phoneno=phone).count() == 0:
-                data_list.append(data)
-
+            data_list.append(data)
         serializer = ShieldSerializer(data=data_list, many=True)
         if serializer.is_valid():
             serializer.save()
