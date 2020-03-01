@@ -68,6 +68,7 @@ class Feed(models.Model):
     before = models.ForeignKey(
         "self", on_delete=models.SET_NULL, related_name='next', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return '{} - {}'.format(self.user.nickname, self.created_at.strftime('%Y/%m/%d %H:%M'))

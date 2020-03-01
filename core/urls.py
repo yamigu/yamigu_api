@@ -7,6 +7,7 @@ urlpatterns = [
     path('match_request/', MatchRequestView.as_view()),
     path('feeds/', FeedListView.as_view()),
     path('feed/<uid>/', FeedView.as_view()),
+    path('feed/<fid>/', FeedView.as_view()),
     path('feed/', FeedCreateView.as_view()),
     path('shield/', ShieldView.as_view()),
     path('like/<fid>/', LikeView.as_view()),
