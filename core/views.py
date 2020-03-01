@@ -387,3 +387,79 @@ class ChatView(APIView):
             serializer.save()
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
+
+
+class ShieldView(APIView):
+    """
+        아는 사람 피하기
+
+        ---
+    """
+    @swagger_auto_schema(request_body=ShieldCreateSerializer, responses={400: 'Bad Request', 201: 'successfully created'})
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        phoneno = None
+        belong = None
+        try:
+            phoneno = request.data['phoneno']
+        except:
+            pass
+        try:
+            belong = request.data['belong']
+        except:
+            pass
+        if phoneno is not None:
+            if user.shield.filter(phoneno=phoneno).count() > 0:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data="aleady exists")
+        elif belong is not None:
+            if user.shield.filter(belong=belong).count() > 0:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data="aleady exists")
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+        shield = Shield(user=user, phoneno=phoneno, belong=belong)
+        shield.save()
+
+        return Response(status=status.HTTP_201_CREATED, data="successfully created")
+
+    @swagger_auto_schema(responses={400: 'Bad Request', 200: ShieldSerializer})
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            serializer = ShieldSerializer(user.shield.all(), many=True)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        except:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+    @swagger_auto_schema(request_body=ShieldCreateSerializer, responses={400: 'Bad Request', 200: 'successfully deleted'})
+    def delete(self, request, *args, **kwargs):
+        user = request.user
+        phoneno = None
+        belong = None
+        try:
+            phoneno = request.data['phoneno']
+        except:
+            pass
+        try:
+            belong = request.data['belong']
+        except:
+            pass
+        if phoneno is not None:
+            if user.shield.filter(phoneno=phoneno).count() > 0:
+                shield = user.shield.get(phoneno=phoneno)
+                shield.delete()
+                return Response(status=status.HTTP_200_OK, data="successfully deleted")
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data="No data")
+        elif belong is not None:
+            if user.shield.filter(belong=belong).count() > 0:
+                shield = user.shield.get(belong=belong)
+                shield.delete()
+                return Response(status=status.HTTP_200_OK, data="successfully deleted")
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data="No data")
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")

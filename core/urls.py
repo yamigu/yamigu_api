@@ -17,4 +17,5 @@ urlpatterns = [
     path('friend/', FriendRequestView.as_view()),
     path('both_like/', BothLikeView.as_view()),
     path('chat/', ChatView.as_view()),
+    path('shield/', ShieldView.as_view()),
 ]

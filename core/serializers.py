@@ -169,3 +169,14 @@ class ChatListSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ('chat_list', )
+
+
+class ShieldCreateSerializer(Serializer):
+    phoneno = CharField(help_text="phoneno", required=False)
+    belong = CharField(help_text="belong", required=False)
+
+
+class ShieldSerializer(ModelSerializer):
+    class Meta:
+        model = Shield
+        fields = '__all__'
