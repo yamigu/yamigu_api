@@ -409,26 +409,31 @@ class ShieldView(APIView):
         phoneno = None
         belong = None
         try:
-            phoneno = request.data['phoneno']
+            phoneno = request.data.getlist('phoneno')
         except:
             pass
         try:
             belong = request.data['belong']
         except:
             pass
-        if phoneno is not None:
-            if user.shield.filter(phoneno=phoneno).count() > 0:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data="aleady exists")
-        elif belong is not None:
-            if user.shield.filter(belong=belong).count() > 0:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data="aleady exists")
-        else:
+        if phoneno is None and belong is None:
             return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+        data_list = []
+        phoneno = list(set(phoneno))
+        for phone in phoneno:
+            data = {
+                'user': user.id,
+                'phoneno': phone,
+                'belong': belong,
+            }
+            if user.shield.filter(phoneno=phone).count() == 0:
+                data_list.append(data)
 
-        shield = Shield(user=user, phoneno=phoneno, belong=belong)
-        shield.save()
-
-        return Response(status=status.HTTP_201_CREATED, data="successfully created")
+        serializer = ShieldSerializer(data=data_list, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED, data=serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
     @swagger_auto_schema(responses={400: 'Bad Request', 200: ShieldSerializer})
     def get(self, request, *args, **kwargs):
