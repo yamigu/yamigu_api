@@ -82,7 +82,7 @@ class FeedListView(APIView):
 
 class FeedView(APIView):
     """
-        피드 자세히 보기 / 삭제 
+        피드 자세히 보기
 
         ---
     """
@@ -94,6 +94,15 @@ class FeedView(APIView):
         serializer = FeedSerializer(user.feed.filter(
             deleted_at__isnull=True), many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+
+class FeedDeleteView(APIView):
+    """
+        피드 삭제
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(responses={200: 'successfully deleted'})
     def patch(self, request, *args, **kwargs):
