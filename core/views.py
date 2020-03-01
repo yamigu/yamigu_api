@@ -466,14 +466,14 @@ class ShieldView(APIView):
             belong = request.data['belong']
         except:
             pass
-        if phoneno is not None:
+        if phoneno is not None and phoneno is not '':
             if user.shield.filter(phoneno=phoneno).count() > 0:
                 shield = user.shield.get(phoneno=phoneno)
                 shield.delete()
                 return Response(status=status.HTTP_200_OK, data="successfully deleted")
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST, data="No data")
-        elif belong is not None:
+        elif belong is not None and belong is not '':
             if user.shield.filter(belong=belong).count() > 0:
                 shield = user.shield.get(belong=belong)
                 shield.delete()
