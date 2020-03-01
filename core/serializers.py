@@ -38,7 +38,7 @@ class FeedListSerializer(ModelSerializer):
 
     @swagger_serializer_method(serializer_or_field=FeedSerializer)
     def get_feed_list(self, user):
-        feed_for_user = user.feed.all()
+        feed_for_user = user.feed.filter(deleted_at__isnull=True)
         return FeedSerializer(feed_for_user, many=True).data
 
     def check_if_liked(self, user):
