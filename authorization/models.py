@@ -56,6 +56,9 @@ class Location(models.Model):
     code = models.SmallIntegerField(unique=True, primary_key=True)
     name = models.CharField(max_length=64)
 
+    def __str__(self):
+        return '{}({})'.format(self.name, self.code)
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     uid = models.CharField(max_length=100, null=True, unique=True)
