@@ -52,6 +52,11 @@ class UserManager(BaseUserManager):
         return user
 
 
+class Location(models.Model):
+    code = models.SmallIntegerField(unique=True, primary_key=True)
+    name = models.CharField(max_length=64)
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     uid = models.CharField(max_length=100, null=True, unique=True)
     username = models.CharField(max_length=100, null=True, unique=True)
@@ -65,7 +70,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     num_of_free = models.IntegerField(default=0)
     something_with = models.ManyToManyField("self")
     created_at = models.DateTimeField(auto_now_add=True)
-
+    location = models.ForeignKey(
+        Location, on_delete=models.SET_NULL, null=True, blank=True)
     token = Token
 
     objects = UserManager()

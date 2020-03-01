@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import *
 admin.site.register(User)
+admin.site.register(Location)
 admin.site.register(ProfileImage)
 admin.site.register(IdentityVerification)
 admin.site.register(BelongVerification)
