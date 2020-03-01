@@ -466,9 +466,6 @@ class ShieldView(APIView):
             belong = request.data['belong']
         except:
             pass
-        print(request.data)
-        print(phoneno)
-        print(belong)
         if phoneno != None and phoneno != '':
             if user.shield.filter(phoneno=phoneno).count() > 0:
                 shield = user.shield.get(phoneno=phoneno)
