@@ -416,10 +416,10 @@ class ShieldView(APIView):
             belong = request.data['belong']
         except:
             pass
-        if phoneno is None and belong is None:
+        if phoneno == None and belong == None:
             return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
         data_list = []
-        if(phoneno is not None and len(phoneno) > 0):
+        if(phoneno != None and len(phoneno) > 0):
             phoneno = list(set(phoneno))
             for phone in phoneno:
                 data = {
