@@ -10,6 +10,9 @@ from drf_yasg.utils import swagger_auto_schema
 from .serializers import *
 from django.db import IntegrityError
 import datetime
+from fcm_django.models import FCMDevice
+from .utils import firebase_message
+import json
 
 
 class MatchRequestView(APIView):
@@ -534,3 +537,26 @@ class BlockView(APIView):
         except:
             pass
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+
+class SendPushView(APIView):
+    """
+        Push 알림 요청
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            user = User.objects.get(uid=request.data['uid'])
+            devices = FCMDevice.objects.filter(user=user)
+            try:
+                data = json.loads(request.data['data'])
+            except TypeError:
+                data = request.data['data']
+            firebase_message.send_push(user.id, data, is_chat=True)
+            return Response(status=status.HTTP_200_OK)
+        except MultiValueDictKeyError:
+            error_msg = json.dumps({
+                'message': 'Bad Request',
+            })
+            return Response(data=error_msg, status=status.HTTP_400_BAD_REQUEST)
