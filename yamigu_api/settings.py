@@ -14,6 +14,14 @@ import firebase_admin
 from firebase_admin import auth, credentials
 import os
 
+import environ
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, True)
+)
+environ.Env.read_env()
+
 # Build paths inside t  he project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -58,6 +66,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.kakao',
     'allauth.socialaccount.providers.apple',
 
+
+    'fcm_django',
 ]
 
 MIDDLEWARE = [
@@ -179,3 +189,17 @@ default_app = firebase_admin.initialize_app(cred)
 
 GOOGLE_KEY_STORE = os.path.join(
     BASE_DIR, "keys") + '/api-7596831323571844011-92784-e6fdb9161dce.json'
+
+
+FCM_DJANGO_SETTINGS = {
+    "APP_VERBOSE_NAME": "com.yamigu.yamigu_app",
+    # default: _('FCM Django')
+    "FCM_SERVER_KEY": env('FCM_SERVER_KEY'),
+    # true if you want to have only one active device per registered user at a time
+    # default: False
+    "ONE_DEVICE_PER_USER": False,
+    # devices to which notifications cannot be sent,
+    # are deleted upon receiving error response from FCM
+    # default: False
+    "DELETE_INACTIVE_DEVICES": False,
+}

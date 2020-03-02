@@ -15,6 +15,7 @@ cryptography==2.8
 defusedxml==0.6.0
 Django==3.0.2
 django-allauth==0.41.0
+django-environ==0.4.5
 django-rest-auth==0.9.5
 djangorestframework==3.11.0
 drf-yasg==1.17.1
