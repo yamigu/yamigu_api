@@ -247,6 +247,19 @@ class YamiView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Unknown Error")
 
 
+class FCMCheckView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            fcm_device = user.fcmdevice_set.get(
+                registration_id=request.data['registration_id'], device_id=request.data['device_id'])
+            return Response(status=status.HTTP_200_OK, data="aleady registered device")
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT, data="no device registered")
+
+
 class KakaoLoginView(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
 
