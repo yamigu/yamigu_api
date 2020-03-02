@@ -3,3 +3,4 @@ media/
 keys/
 *.pyc
 **/migrations/*
+.env
