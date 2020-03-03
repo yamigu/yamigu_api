@@ -41,10 +41,10 @@ class ProfileSerializer(ModelSerializer):
         return None
 
     def get_avata(self, user):
-        if(hasattr(user, 'image')):
-            if(user.image.last() is not None):
-                return ImageSerializer(user.image.get(number=1).data).data['src']
-        return None
+        try:
+            return ImageSerializer(user.image.get(number=1).data).data['src']
+        except:
+            return None
 
     def get_verified(self, user):
         if(hasattr(user, 'bv')):
