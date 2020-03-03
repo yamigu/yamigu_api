@@ -223,22 +223,24 @@ class IdentityVerificationCreateView(APIView):
         user = User.objects.get(uid=request.data['uid'])
         data = {
             'user': user.id,
-            'realname': request.data['realname'],
+            'realname': request.data['name'],
             'birthdate': request.data['birthdate'],
             'gender': request.data['gender'],
-            'phoneno': request.data['phoneno'],
+            'phoneno': request.data['mibileno'],
         }
-        iv = IdentityVerification.objects.get(phoneno=request.data['phoneno'])
-        if iv is not None:
+        try:
+            iv = IdentityVerification.objects.get(
+                phoneno=request.data['mobileno'])
             serializer = IdentityVerificationSerializer(iv, data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(status=status.HTTP_200_OK, data="successfully requested")
             return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
-        serializer = IdentityVerificationSerializer(data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_200_OK, data="successfully requested")
+        except ObjectDoesNotExist:
+            serializer = IdentityVerificationSerializer(data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_200_OK, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
 
