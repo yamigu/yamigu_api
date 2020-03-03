@@ -231,13 +231,13 @@ class IdentityVerificationCreateView(APIView):
         try:
             iv = IdentityVerification.objects.get(
                 phoneno=request.data['mobileno'])
-            serializer = IdentityVerificationSerializer(iv, data)
+            serializer = IdentityVerificationSerializer(iv, data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(status=status.HTTP_200_OK, data="successfully requested")
             return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
         except ObjectDoesNotExist:
-            serializer = IdentityVerificationSerializer(data)
+            serializer = IdentityVerificationSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(status=status.HTTP_200_OK, data="successfully requested")
