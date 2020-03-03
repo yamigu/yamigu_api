@@ -226,7 +226,7 @@ class IdentityVerificationCreateView(APIView):
             'realname': request.data['name'],
             'birthdate': request.data['birthdate'],
             'gender': request.data['gender'],
-            'phoneno': request.data['mibileno'],
+            'phoneno': request.data['mobileno'],
         }
         try:
             iv = IdentityVerification.objects.get(
