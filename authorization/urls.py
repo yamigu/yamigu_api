@@ -15,6 +15,8 @@ urlpatterns = [
     path('user/signup/', SignupView.as_view()),
     path('user/belong_verification/', BelongVerificationView.as_view()),
     path('user/identity_verification/', IdentityVerificationView.as_view()),
+    path('user/identity_verification/create/',
+         IdentityVerificationCreateView.as_view()),
     path('user/yami/', YamiView.as_view()),
     path('fcm/check_device/', FCMCheckView.as_view()),
     path('fcm/register_device/',

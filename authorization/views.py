@@ -216,9 +216,11 @@ class IdentityVerificationView(APIView):
             return Response(status=status.HTTP_200_OK, data=serializer.data)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
+
+class IdentityVerificationCreateView(APIView):
     @swagger_auto_schema(request_body=IdentityVerificationSerializer, responses={200: "successfully created", 400: "Bad Request"})
     def post(self, request, *args, **kwargs):
-        user = request.user
+        user = User.objects.get(uid=request.data.get['uid'])
         data = {
             'user': user.id,
             'realname': request.data['realname'],
