@@ -19,4 +19,5 @@ urlpatterns = [
     path('fcm/check_device/', FCMCheckView.as_view()),
     path('fcm/register_device/',
          FCMDeviceAuthorizedViewSet.as_view({'post': 'create'}), name='create_fcm_device'),
+    path('validation/nickname/', NicknameValidationView.as_view()),
 ]

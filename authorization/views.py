@@ -260,6 +260,16 @@ class FCMCheckView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT, data="no device registered")
 
 
+class NicknameValidationView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        users = User.objects.filter(nickname=request.data['nickname'])
+        if users.count() > 0:
+            return Response(status=status.HTTP_409_CONFLICT, data="aleady exists")
+        return Response(status=status.HTTP_200_OK, data="available nickname")
+
+
 class KakaoLoginView(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
 
