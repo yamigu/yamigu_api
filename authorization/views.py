@@ -97,7 +97,7 @@ class SignupView(APIView):
 
         except ObjectDoesNotExist:
             bv = BelongVerification(
-                user=user.id,
+                user=user,
                 belong=request.data['belong'],
                 department=request.data['department'],
                 is_student=True if request.data['is_student'] == 'true' else False
