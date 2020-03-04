@@ -398,6 +398,8 @@ class ChatView(APIView):
         }
         serializer = ChatCreateSerializer(data=data)
         if serializer.is_valid():
+            user.num_of_yami = user.num_of_yami - 3
+            user.save()
             serializer.save()
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
