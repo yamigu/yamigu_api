@@ -143,6 +143,9 @@ class Chat(models.Model):
     canceled_on = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('sender', 'receiver')
+
 
 class Notification(models.Model):
     user = models.ForeignKey(
