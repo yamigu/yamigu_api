@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from authorization.models import User, IdentityVerification
 from file_management.models import Image
 
@@ -143,8 +144,18 @@ class Chat(models.Model):
     canceled_on = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = (('sender', 'receiver'), ('receiver', 'sender'))
+    def clean(self):
+        super(Chat, self).clean()
+        direct = Chat.objects.filter(
+            sender=self.sender, receiver=self.receiver)
+        reverse = Chat.objects.filter(
+            sender=self.receiver, receiver=self.sender)
+        if direct.exists() or reverse.exists():
+            raise ValidationError('Aleady Exists')
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super(Chat, self).save(*args, **kwargs)
 
 
 class Notification(models.Model):
