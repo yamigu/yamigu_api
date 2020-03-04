@@ -160,8 +160,10 @@ class ChatListSerializer(ModelSerializer):
 
     @swagger_serializer_method(serializer_or_field=ChatSerializer)
     def get_chat_list(self, user):
-        chat_sent = user.chat_sent.filter(declined_on__isnull=False)
-        chat_recv = user.chat_recv.filter(declined_on__isnull=False)
+        chat_sent = user.chat_sent.filter(
+            declined_on__isnull=True).filter(canceled_on__isnull=True)
+        chat_recv = user.chat_recv.filter(
+            declined_on__isnull=True).filter(canceled_on__isnull=True)
         data = chat_sent | chat_recv
         serializer = ChatSerializer(data, many=True)
         return serializer.data
