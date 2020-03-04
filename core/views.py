@@ -404,6 +404,26 @@ class ChatView(APIView):
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
+    def patch(self, request, *args, **kwargs):
+        user = request.user
+        room_id = request.data['room_id']
+        action = request.data['action']
+        chat = Chat.objects.get(id=room_id)
+
+        if action == 'APPROVE':
+            chat.approved_on = datetime.datetime.now()
+            chat.save()
+            return Response(status=status.HTTP_202_ACCEPTED, data="successfully approved")
+        elif action == 'DECLINE':
+            chat.declined_on = datetime.datetime.now()
+            chat.save()
+            return Response(status=status.HTTP_200_OK, data="successfully declined")
+        elif action == 'CANCEL':
+            chat.canceled_on = datetime.datetime.now()
+            chat.save()
+            return Response(status=status.HTTP_200_OK, data="successfully canceled")
+        return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')
+
 
 class ShieldView(APIView):
     """

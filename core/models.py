@@ -154,7 +154,8 @@ class Chat(models.Model):
             raise ValidationError('Aleady Exists')
 
     def save(self, *args, **kwargs):
-        self.full_clean()
+        if not self.pk:
+            self.full_clean()
         return super(Chat, self).save(*args, **kwargs)
 
 
