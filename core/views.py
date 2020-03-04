@@ -31,7 +31,7 @@ class MatchRequestView(APIView):
             if mr.status == MatchRequest.STATUS_CODE_MATCHING:
                 serializer = MatchRequestSerializer(mr)
                 return Response(status=status.HTTP_200_OK, data=serializer.data)
-        return Response(status=status.HTTP_204_NO_CONTENT, data="no match request")
+        return Response(status=status.HTTP_202_ACCEPTED, data="no match request")
 
     @swagger_auto_schema(request_body=MatchRequestSerializer, responses={201: "successfully requested", 400: "Bad Request"})
     def post(self, request, *args, **kwargs):
