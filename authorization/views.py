@@ -129,7 +129,7 @@ class ProfileImageView(APIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        number = request.data['number']
+        number = int(request.data['number'])
         TAG = "Profile"
         file_name = save_uploaded_file(request.data['image'], TAG)
         image = Image(
@@ -137,6 +137,7 @@ class ProfileImageView(APIView):
         )
         image.save()
         profile_image = None
+        is_new = False
         try:
             profile_image = user.image.get(number=number)
             profile_image.data = image
@@ -148,6 +149,8 @@ class ProfileImageView(APIView):
                 data=image,
                 number=number
             )
+            if number == 1:
+                is_new = True
 
         profile_image.save()
         rotate_image(get_file_path(file_name, TAG))
@@ -171,6 +174,10 @@ class ProfileImageView(APIView):
         feed_image.save()
         fserializer = FeedSerializer(feed)
         data["feed"] = fserializer.data
+        if is_new:
+            user.num_of_yami = user.num_of_yami + 5
+            user.save()
+            data["bonus"] = 5
         return Response(status=status.HTTP_200_OK, data=data)
 
 
