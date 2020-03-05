@@ -47,12 +47,12 @@ class MatchRequestView(APIView):
         elif user.num_of_yami >= 2:
             user.num_of_yami = user.num_of_yami - 2
             rstatus = MatchRequest.STATUS_CODE_MATCHING_YAMI
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami or free tickets')
         rdata = {
             'free': user.num_of_free,
             'yami': user.num_of_yami
         }
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami or free tickets')
         data = {
             'user': user.id,
             'status': rstatus,
