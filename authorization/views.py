@@ -8,6 +8,8 @@ from allauth.socialaccount.providers.apple.views import AppleOAuth2Adapter
 from rest_auth.registration.views import SocialLoginView
 from .serializers import *
 from .models import *
+from core.models import Feed, FeedImage
+from core.serializers import FeedSerializer
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from file_management.models import *
 from file_management.serializers import *
@@ -146,11 +148,29 @@ class ProfileImageView(APIView):
                 data=image,
                 number=number
             )
+
         profile_image.save()
         rotate_image(get_file_path(file_name, TAG))
         serializer = ImageSerializer(image)
         data = serializer.data
         data['number'] = number
+
+        before = None
+        if(hasattr(user, 'feed')):
+            before = user.feed.last()
+
+        feed = Feed(
+            user=user,
+            before=before
+        )
+        feed.save()
+        feed_image = FeedImage(
+            feed=feed,
+            data=image
+        )
+        feed_image.save()
+        fserializer = FeedSerializer(feed)
+        data["feed"] = fserializer.data
         return Response(status=status.HTTP_200_OK, data=data)
 
 
