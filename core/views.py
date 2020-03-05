@@ -80,9 +80,13 @@ class FeedListView(APIView):
         users = User.objects.all().exclude(id=user.id)  # exclude me
         users = users.exclude(nickname__isnull=True)  # exclude no Nickname
         users = users.exclude(iv__isnull=True)  # exclude no IV
+        something_id = []
         blocked_id = []
+        for something in user.something_with.all():
+            something_id.append(something.id)
         for blocked in user.disconnected_with.all():
             blocked_id.append(blocked.id)
+        users = users.exclude(id__in=something_id)
         users = users.exclude(id__in=blocked_id)
         shields = user.shield.all()
 
