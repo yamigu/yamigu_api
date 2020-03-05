@@ -197,3 +197,9 @@ class ReportCreateSerializer(Serializer):
 
 class BlockCreateSerializer(Serializer):
     who = CharField(help_text="차단할 대상 유저의 uid", required=True)
+
+
+class NotificationSerializer(ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'

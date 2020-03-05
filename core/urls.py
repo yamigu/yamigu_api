@@ -21,4 +21,5 @@ urlpatterns = [
     path('report/', ReportView.as_view()),
     path('block/', BlockView.as_view()),
     path('send_push/', SendPushView.as_view()),
+    path('toggle_notification/', ToggleNotificationView.as_view()),
 ]

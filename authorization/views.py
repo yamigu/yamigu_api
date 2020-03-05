@@ -311,6 +311,28 @@ class NicknameValidationView(APIView):
         return Response(status=status.HTTP_200_OK, data="available nickname")
 
 
+class HeightEnterView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        height = request.data['height']
+        user.height = height
+        user.save()
+        return Response(status=status.HTTP_200_OK, data="successfully requested")
+
+
+class LocationEnterView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        location_name = request.data['location']
+        user.location = Location.objects.get(name=location_name)
+        user.save()
+        return Response(status=status.HTTP_200_OK, data="successfully requested")
+
+
 class KakaoLoginView(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
 

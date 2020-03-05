@@ -63,7 +63,7 @@ class ProfileSerializer(ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('uid', 'nickname', 'birthdate', 'gender',
-                  'belong', 'department', 'avata', 'verified', 'location')
+                  'belong', 'department', 'avata', 'verified', 'location', 'height')
 
 
 class BVImageSerializer(ModelSerializer):

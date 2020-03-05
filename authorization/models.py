@@ -76,6 +76,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     location = models.ForeignKey(
         Location, on_delete=models.SET_NULL, null=True, blank=True)
+    height = models.CharField(max_length=64, blank=True, null=True)
     token = Token
 
     objects = UserManager()

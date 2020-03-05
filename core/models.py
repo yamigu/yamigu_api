@@ -160,7 +160,7 @@ class Chat(models.Model):
 
 
 class Notification(models.Model):
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='notification')
     like = models.BooleanField(default=True)
     like_match = models.BooleanField(default=True)

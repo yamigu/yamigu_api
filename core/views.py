@@ -593,3 +593,46 @@ class SendPushView(APIView):
                 'message': 'Bad Request',
             })
             return Response(data=error_msg, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ToggleNotificationView(APIView):
+    """
+        알림 토글
+    """
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        notification = None
+        try:
+            notification = user.notification
+        except ObjectDoesNotExist:
+            notification = Notification(user=user)
+        serializer = NotificationSerializer(notification)
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        notification = None
+        try:
+            notification = user.notification
+        except ObjectDoesNotExist:
+            notification = Notification(user=user)
+        toggle_what = request.data['what']
+        result = None
+        if toggle_what == 'like':
+            result = not notification.like
+            notification.like = not notification.like
+        elif toggle_what == 'like_match':
+            result = not notificatio.like_match
+            notification.like_match = not notification.like_match
+        elif toggle_what == 'request':
+            result = not notification.request
+            notification.request = not notification.request
+        elif toggle_what == 'match':
+            result = not notification.match
+            notification.match = not notification.match
+        elif toggle_what == 'chat':
+            result = not notification.chat
+            notification.chat = not notification.chat
+        notification.save()
+        return Response(status=status.HTTP_200_OK, data=result)
