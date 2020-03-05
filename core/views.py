@@ -51,6 +51,8 @@ class MatchRequestView(APIView):
         serializer = MatchRequestSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            user.num_of_free = user.num_of_free - 1
+            user.save()
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
@@ -62,6 +64,8 @@ class MatchRequestView(APIView):
             if mr.status == MatchRequest.STATUS_CODE_MATCHING:
                 mr.status = MatchRequest.STATUS_CODE_CANCELED
                 mr.save()
+                user.num_of_free = user.num_of_free + 1
+                user.save()
                 return Response(status=status.HTTP_202_ACCEPTED, data="successfully canceled")
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
