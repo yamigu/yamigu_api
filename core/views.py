@@ -51,8 +51,14 @@ class MatchRequestView(APIView):
         serializer = MatchRequestSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            user.num_of_free = user.num_of_free - 1
-            user.save()
+            if user.num_of_free >= 1:
+                user.num_of_free = user.num_of_free - 1
+                user.save()
+            elif user.num_of_yami >= 2:
+                user.num_of_yami = user.num_of_yami - 2
+                user.save()
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami or free tickets')
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
@@ -415,8 +421,11 @@ class ChatView(APIView):
         if serializer.is_valid():
 
             serializer.save()
-            user.num_of_yami = user.num_of_yami - 3
-            user.save()
+            if(user.num_of_yami >= 3):
+                user.num_of_yami = user.num_of_yami - 3
+                user.save()
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami')
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
