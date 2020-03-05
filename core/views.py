@@ -40,9 +40,18 @@ class MatchRequestView(APIView):
         date = request.data['date_selected']
         min_age = request.data['min_age']
         max_age = request.data['max_age']
+        status = MatchRequest.STATUS_CODE_MATCHING
+        if user.num_of_free >= 1:
+            user.num_of_free = user.num_of_free - 1
+            status = MatchRequest.STATUS_CODE_MATCHING
+        elif user.num_of_yami >= 2:
+            user.num_of_yami = user.num_of_yami - 2
+            status = MatchRequest.STATUS_CODE_MATCHING_YAMI
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami or free tickets')
         data = {
             'user': user.id,
-            'status': MatchRequest.STATUS_CODE_MATCHING,
+            'status': status,
             'personnel_selected': personnel,
             'date_selected': date,
             'min_age': min_age,
@@ -51,14 +60,7 @@ class MatchRequestView(APIView):
         serializer = MatchRequestSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            if user.num_of_free >= 1:
-                user.num_of_free = user.num_of_free - 1
-                user.save()
-            elif user.num_of_yami >= 2:
-                user.num_of_yami = user.num_of_yami - 2
-                user.save()
-            else:
-                return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami or free tickets')
+            user.save()
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
@@ -71,6 +73,12 @@ class MatchRequestView(APIView):
                 mr.status = MatchRequest.STATUS_CODE_CANCELED
                 mr.save()
                 user.num_of_free = user.num_of_free + 1
+                user.save()
+                return Response(status=status.HTTP_202_ACCEPTED, data="successfully canceled")
+            elif mr.status == MatchRequest.STATUS_CODE_MATCHING_YAMI:
+                mr.status = MatchRequest.STATUS_CODE_CANCELED
+                mr.save()
+                user.num_of_yami = user.num_of_yami + 2
                 user.save()
                 return Response(status=status.HTTP_202_ACCEPTED, data="successfully canceled")
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
