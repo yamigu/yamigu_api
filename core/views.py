@@ -278,11 +278,12 @@ class BothLikeView(APIView):
         user = request.user
         chat_sent = user.chat_sent.all()
         chat_recv = user.chat_recv.all()
+
+        somethings = user.something_with.all()
         for chat in chat_sent:
             somethings = somethings.exclude(id=chat.receiver.id)
         for chat in chat_recv:
             somethings = somethings.exclude(id=chat.sender.id)
-        somethings = user.something_with.all()
         serializer = ProfileSerializer(somethings, many=True)
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
