@@ -28,7 +28,7 @@ class MatchRequestView(APIView):
         user = request.user
         if hasattr(user, 'match_request') and user.match_request.last() is not None:
             mr = user.match_request.last()
-            if mr.status == MatchRequest.STATUS_CODE_MATCHING:
+            if mr.status == MatchRequest.STATUS_CODE_MATCHING or mr.status == MatchRequest.STATUS_CODE_MATCHING_YAMI:
                 serializer = MatchRequestSerializer(mr)
                 return Response(status=status.HTTP_200_OK, data=serializer.data)
         return Response(status=status.HTTP_202_ACCEPTED, data="no match request")
