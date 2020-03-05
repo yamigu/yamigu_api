@@ -47,6 +47,10 @@ class MatchRequestView(APIView):
         elif user.num_of_yami >= 2:
             user.num_of_yami = user.num_of_yami - 2
             rstatus = MatchRequest.STATUS_CODE_MATCHING_YAMI
+        rdata = {
+            'free': user.num_of_free,
+            'yami': user.num_of_yami
+        }
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami or free tickets')
         data = {
@@ -61,7 +65,7 @@ class MatchRequestView(APIView):
         if serializer.is_valid():
             serializer.save()
             user.save()
-            return Response(status=status.HTTP_201_CREATED, data="successfully requested")
+            return Response(status=status.HTTP_201_CREATED, data=rdata)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
     @swagger_auto_schema(responses={202: "successfully canceled", 400: "Bad Request"})
@@ -74,13 +78,21 @@ class MatchRequestView(APIView):
                 mr.save()
                 user.num_of_free = user.num_of_free + 1
                 user.save()
-                return Response(status=status.HTTP_202_ACCEPTED, data="successfully canceled")
+                rdata = {
+                    'free': user.num_of_free,
+                    'yami': user.num_of_yami
+                }
+                return Response(status=status.HTTP_202_ACCEPTED, data=rdata)
             elif mr.status == MatchRequest.STATUS_CODE_MATCHING_YAMI:
                 mr.status = MatchRequest.STATUS_CODE_CANCELED
                 mr.save()
                 user.num_of_yami = user.num_of_yami + 2
                 user.save()
-                return Response(status=status.HTTP_202_ACCEPTED, data="successfully canceled")
+                rdata = {
+                    'free': user.num_of_free,
+                    'yami': user.num_of_yami
+                }
+                return Response(status=status.HTTP_202_ACCEPTED, data=rdata)
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
 
