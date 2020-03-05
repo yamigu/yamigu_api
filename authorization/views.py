@@ -288,6 +288,23 @@ class YamiView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Unknown Error")
 
 
+class FreeTicketView(APIView):
+    """
+        무료 티켓 정보
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            return Response(status=status.HTTP_200_OK, data=user.num_of_free)
+        except:
+            pass
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Unknown Error")
+
+
 class FCMCheckView(APIView):
     permission_classes = [IsAuthenticated]
 
