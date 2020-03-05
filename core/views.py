@@ -276,11 +276,11 @@ class BothLikeView(APIView):
     @swagger_auto_schema(responses={200: ProfileSerializer})
     def get(self, request, *args, **kwargs):
         user = request.user
-        sent_chat = user.sent_chat.all()
-        recv_chat = user.recv_chat.all()
-        for chat in sent_chat:
+        chat_sent = user.chat_sent.all()
+        chat_recv = user.chat_recv.all()
+        for chat in chat_sent:
             somethings = somethings.exclude(id=chat.receiver.id)
-        for chat in recv_chat:
+        for chat in chat_recv:
             somethings = somethings.exclude(id=chat.sender.id)
         somethings = user.something_with.all()
         serializer = ProfileSerializer(somethings, many=True)
