@@ -71,8 +71,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     hide_department = models.BooleanField(default=False)
     num_of_yami = models.IntegerField(default=0)
     num_of_free = models.IntegerField(default=0)
-    something_with = models.ManyToManyField("self")
-    disconnected_with = models.ManyToManyField("self")
+    something_with = models.ManyToManyField("self", blank=True, null=True)
+    disconnected_with = models.ManyToManyField("self", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     location = models.ForeignKey(
         Location, on_delete=models.SET_NULL, null=True, blank=True)
