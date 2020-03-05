@@ -623,7 +623,7 @@ class ToggleNotificationView(APIView):
             result = not notification.like
             notification.like = not notification.like
         elif toggle_what == 'like_match':
-            result = not notificatio.like_match
+            result = not notification.like_match
             notification.like_match = not notification.like_match
         elif toggle_what == 'request':
             result = not notification.request
