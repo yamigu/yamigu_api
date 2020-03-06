@@ -318,6 +318,26 @@ class BothLikeView(APIView):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
+class LikeCountView(APIView):
+    """
+        좋아요 개수
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            feeds = user.feed.all()
+            like_count = 0
+            for feed in feeds:
+                like_count = like_count + feed.like.all().count()
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
+        return Response(status=status.HTTP_200_OK, data=like_count)
+
+
 class FriendView(APIView):
     """
         친구 리스트
