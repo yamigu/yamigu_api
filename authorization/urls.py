@@ -9,6 +9,7 @@ urlpatterns = [
     path('oauth/kakao/', KakaoLoginView.as_view()),
     path('oauth/apple/', AppleLoginView.as_view()),
     path('withdraw/', WithdrawView.as_view()),
+    path('logout/', LogoutView.as_view()),
     path('firebase/token/', FireBaseAuthView.as_view()),
     path('user/info/height/', HeightEnterView.as_view()),
     path('user/info/location/', LocationEnterView.as_view()),
