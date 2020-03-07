@@ -108,6 +108,7 @@ class FeedListView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         users = User.objects.all().exclude(id=user.id)  # exclude me
+        users = users.exclude(is_staff=True)  # exclude manager
         users = users.exclude(nickname__isnull=True)  # exclude no Nickname
         users = users.exclude(iv__isnull=True)  # exclude no IV
         something_id = []
@@ -335,7 +336,7 @@ class LikeCountView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         try:
-            feeds = user.feed.all().exclude(is_staff=True)
+            feeds = user.feed.all()
             like_count = 0
             for feed in feeds:
                 like_count = like_count + feed.like.all().count()
