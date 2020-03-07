@@ -350,6 +350,16 @@ class LocationEnterView(APIView):
         return Response(status=status.HTTP_200_OK, data="successfully requested")
 
 
+class WithdrawView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        user.uid = 'withdrawed-{}'.format(user.uid)
+        user.save()
+        return Response(status=status.HTTP_200_OK, data="successfully requested")
+
+
 class KakaoLoginView(SocialLoginView):
     adapter_class = KakaoOAuth2Adapter
 
