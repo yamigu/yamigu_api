@@ -366,8 +366,7 @@ class WithdrawView(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         user.auth_token.delete()
-        user.is_active = False
-        user.save()
+        user.delete()
         return Response(status=status.HTTP_200_OK, data="successfully requested")
 
 
