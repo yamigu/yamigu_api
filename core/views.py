@@ -335,7 +335,7 @@ class LikeCountView(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         try:
-            feeds = user.feed.all()
+            feeds = user.feed.all().exclude(is_staff=True)
             like_count = 0
             for feed in feeds:
                 like_count = like_count + feed.like.all().count()
