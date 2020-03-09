@@ -9,7 +9,7 @@ from rest_auth.registration.views import SocialLoginView
 from .serializers import *
 from .models import *
 from core.models import Feed, FeedImage
-from core.serializers import FeedSerializer
+from core.serializers import FeedSerializer, FriendListSerializer
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from file_management.models import *
 from file_management.serializers import *
@@ -20,6 +20,8 @@ from drf_yasg.utils import swagger_auto_schema
 import firebase_admin
 from firebase_admin import auth
 from firebase_admin._auth_utils import UserNotFoundError
+
+import json
 
 
 def create_token_uid(uid):
@@ -74,7 +76,11 @@ class UserInfoView(APIView):
             if user is None:
                 return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
         serializer = ProfileSerializer(user)
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        data = serializer.data
+        if kwargs.get('uid') != None:
+            data = dict(data)
+            data['friends'] = FriendListSerializer(user).data['friends']
+        return Response(status=status.HTTP_200_OK, data=data)
 
 
 class SignupView(APIView):

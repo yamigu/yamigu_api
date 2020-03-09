@@ -122,6 +122,28 @@ class FriendRequestPatchSerializer(Serializer):
     action = CharField(help_text='APPROVE or DELETE or CANCEL')
 
 
+class FriendListSerializer(ModelSerializer):
+    friends = SerializerMethodField('get_friends')
+
+    def get_friends(self, user):
+        received_request = []
+        sent_request = []
+        received_request = user.iv.received_request.filter(
+            approved_on__isnull=False)
+        sent_request = user.iv.sent_request.filter(
+            approved_on__isnull=False)
+        friends_list = []
+        for request in received_request:
+            friends_list.append(request.requestor.user)
+        for request in sent_request:
+            friends_list.append(request.requestee.user)
+        return ProfileSerializer(friends_list, many=True).data
+
+    class Meta:
+        model = User
+        fields = ('friends', )
+
+
 class ChatCreateAPISerializer(Serializer):
     target_uid = CharField(help_text='Partner\'s UID')
 
