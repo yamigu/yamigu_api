@@ -146,7 +146,7 @@ class Chat(models.Model):
     declined_on = models.DateTimeField(null=True, blank=True)
     canceled_on = models.DateTimeField(null=True, blank=True)
     canceled_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='chat_canceled', null=True)
+        User, on_delete=models.CASCADE, related_name='chat_canceled', null=True, blank=True)
     cancel_check = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
