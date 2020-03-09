@@ -30,11 +30,14 @@ class EditLinkToInlineObject(object):
 
 class BVImageInline(admin.TabularInline):
     model = BVImage
+    readonly_fields = ('bv_image',)
+
+    def bv_image(self, obj):
+        return mark_safe('<img src="{url}" width="320px" />'.format(url=obj.data.src))
 
 
 class BVInline(EditLinkToInlineObject, admin.TabularInline):
     model = BelongVerification
-
     readonly_fields = ('bv_image',)
 
     def bv_image(self, obj):
