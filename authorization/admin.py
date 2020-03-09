@@ -66,8 +66,7 @@ class SentChatInline(admin.TabularInline):
 
 class UserAdmin(admin.ModelAdmin):
     search_fields = ('nickname', 'uid', 'real_name')
-    readonly_fields = ('verified', 'num_of_yami',
-                       'num_of_free')
+    readonly_fields = ('verified')
     list_display = ('uid', 'nickname', 'personal_info', 'belong',
                     'verified', 'num_of_yami', 'num_of_free')
     exclude = ('is_admin', 'is_staff', 'is_active', 'password',
