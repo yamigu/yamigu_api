@@ -40,8 +40,14 @@ class BVInline(BVEditLinkToInlineObject, admin.TabularInline):
 
 class BVImageAdmin(admin.ModelAdmin):
     model = BVImage
-    readonly_fields = ('bv_image', )
+    readonly_fields = ('belong', 'department', 'bv_image')
     exclude = ('data',)
+
+    def belong(self, obj):
+        return obj.bv.belong
+
+    def department(self, obj):
+        return obj.bv.department
 
     def bv_image(self, obj):
         url = ImageSerializer(obj.data).data
