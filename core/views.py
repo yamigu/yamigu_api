@@ -474,7 +474,7 @@ class ChatView(APIView):
                 user.save()
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami')
-            return Response(status=status.HTTP_201_CREATED, data=serializer.data.id)
+            return Response(status=status.HTTP_201_CREATED, data=serializer.data)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
     def patch(self, request, *args, **kwargs):
