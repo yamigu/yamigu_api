@@ -28,14 +28,6 @@ class EditLinkToInlineObject(object):
             return ''
 
 
-class BVImageInline(admin.TabularInline):
-    model = BVImage
-    readonly_fields = ('bv_image',)
-
-    def bv_image(self, obj):
-        return mark_safe('<img src="{url}" width="320px" />'.format(url=obj.data.src))
-
-
 class BVInline(EditLinkToInlineObject, admin.TabularInline):
     model = BelongVerification
     readonly_fields = ('bv_image',)
@@ -54,7 +46,8 @@ class ProfileImageInline(admin.TabularInline):
     max_num = 1
 
     def profile_image(self, obj):
-        return mark_safe('<img src="{url}" width="320px" />'.format(url=obj.data.src))
+        url = ImageSerializer(obj.data).data
+        return mark_safe('<img src="{url}" width="320px" />'.format(url=url['src']))
 
 
 class RecvChatInline(admin.TabularInline):
