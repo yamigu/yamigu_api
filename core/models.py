@@ -140,6 +140,7 @@ class Chat(models.Model):
         User, on_delete=models.CASCADE, related_name='chat_sent', null=True)
     receiver = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='chat_recv', null=True)
+    greet = models.CharField(max_length=128, default="안녕하세요")
     chat_type = models.SmallIntegerField(default=0)
     approved_on = models.DateTimeField(null=True, blank=True)
     declined_on = models.DateTimeField(null=True, blank=True)

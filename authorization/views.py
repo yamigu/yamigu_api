@@ -174,10 +174,10 @@ class ProfileImageView(APIView):
         feed_image.save()
         fserializer = FeedSerializer(feed)
         data["feed"] = fserializer.data
-        if is_new:
-            user.num_of_yami = user.num_of_yami + 5
-            user.save()
-            data["bonus"] = 5
+        # if is_new:
+        #     user.num_of_yami = user.num_of_yami + 5
+        #     user.save()
+        #     data["bonus"] = 5
         return Response(status=status.HTTP_200_OK, data=data)
 
 

@@ -462,7 +462,8 @@ class ChatView(APIView):
         target = User.objects.get(uid=request.data['target_uid'])
         data = {
             'sender': user.id,
-            'receiver': target.id
+            'receiver': target.id,
+            'greet': request.data['greet']
         }
         serializer = ChatCreateSerializer(data=data)
         if serializer.is_valid():
