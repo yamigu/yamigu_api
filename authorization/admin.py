@@ -10,7 +10,6 @@ admin.site.register(Location)
 admin.site.register(ProfileImage)
 admin.site.register(IdentityVerification)
 admin.site.register(BelongVerification)
-admin.site.register(BVImage)
 admin.site.register(FirebaseToken)
 
 
@@ -18,23 +17,34 @@ class IVInline(admin.TabularInline):
     model = IdentityVerification
 
 
-class EditLinkToInlineObject(object):
+class BVEditLinkToInlineObject(object):
     def edit_link(self, instance):
-        url = reverse('admin:%s_%s_change' % (
-            instance._meta.app_label,  instance._meta.model_name),  args=[instance.pk])
+        print(instance._meta.model_name)
+        url = reverse('admin:authorization_bvimage_change',
+                      args=[instance.image.last().pk])
         if instance.pk:
             return mark_safe(u'<a href="{u}">edit</a>'.format(u=url))
         else:
             return ''
 
 
-class BVInline(EditLinkToInlineObject, admin.TabularInline):
+class BVInline(BVEditLinkToInlineObject, admin.TabularInline):
     model = BelongVerification
-    readonly_fields = ('bv_image',)
+    readonly_fields = ('bv_image', 'edit_link')
 
     def bv_image(self, obj):
 
         url = ImageSerializer(obj.image.last().data).data
+        return mark_safe('<img src="{url}" width="320px" />'.format(url=url['src']))
+
+
+class BVImageAdmin(admin.ModelAdmin):
+    model = BVImage
+    readonly_fields = ('bv_image', )
+    exclude = ('data',)
+
+    def bv_image(self, obj):
+        url = ImageSerializer(obj.data).data
         return mark_safe('<img src="{url}" width="320px" />'.format(url=url['src']))
 
 
@@ -101,6 +111,8 @@ class UserAdmin(admin.ModelAdmin):
 
 
 admin.site.register(User, UserAdmin)
+admin.site.register(BVImage, BVImageAdmin)
+
 # class UserAdmin(admin.ModelAdmin):
 #     list_filter = ('is_certified',)
 #     list_display = ('id', 'uid', 'nickname', 'birth', 'gender_string', 'real_name', 'is_certified_string', 'yami')
