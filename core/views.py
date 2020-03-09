@@ -493,6 +493,11 @@ class ChatView(APIView):
             return Response(status=status.HTTP_200_OK, data="successfully declined")
         elif action == 'CANCEL':
             chat.canceled_on = datetime.datetime.now()
+            chat.canceled_by = user
+            chat.save()
+            return Response(status=status.HTTP_200_OK, data="successfully canceled")
+        elif action == 'CANCEL_CHECK':
+            chat.cancel_check = True
             chat.save()
             return Response(status=status.HTTP_200_OK, data="successfully canceled")
         return Response(status=status.HTTP_400_BAD_REQUEST, data='Bad Request')

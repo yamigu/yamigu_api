@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, Serializer, IntegerField, CharField
 from django.db import models
+from django.db.models import Q
 from .models import *
 from authorization.serializers import ProfileSerializer
 from drf_yasg.utils import swagger_serializer_method
@@ -161,9 +162,9 @@ class ChatListSerializer(ModelSerializer):
     @swagger_serializer_method(serializer_or_field=ChatSerializer)
     def get_chat_list(self, user):
         chat_sent = user.chat_sent.filter(
-            declined_on__isnull=True).filter(canceled_on__isnull=True)
+            declined_on__isnull=True).exclude(Q(canceled_on__isnull=False) & Q(canceled_by=user)).exclude(cancel_check=True)
         chat_recv = user.chat_recv.filter(
-            declined_on__isnull=True).filter(canceled_on__isnull=True)
+            declined_on__isnull=True).exclude(Q(canceled_on__isnull=False) & Q(canceled_by=user)).exclude(cancel_check=True)
         data = chat_sent | chat_recv
         serializer = ChatSerializer(data, many=True)
         return serializer.data
