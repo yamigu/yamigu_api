@@ -7,10 +7,6 @@ from file_management.serializers import *
 from django.urls import reverse
 
 admin.site.register(Location)
-admin.site.register(ProfileImage)
-admin.site.register(IdentityVerification)
-admin.site.register(BelongVerification)
-admin.site.register(FirebaseToken)
 
 
 class IVInline(admin.TabularInline):
