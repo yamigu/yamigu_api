@@ -456,7 +456,7 @@ class ChatView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
-    @swagger_auto_schema(request_body=ChatCreateAPISerializer, responses={400: 'Bad Request', 201: 'successfully requested'})
+    @swagger_auto_schema(request_body=ChatCreateAPISerializer, responses={400: 'Bad Request', 201: 'roomId'})
     def post(self, request, *args, **kwargs):
         user = request.user
         target = User.objects.get(uid=request.data['target_uid'])
@@ -474,7 +474,7 @@ class ChatView(APIView):
                 user.save()
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST, data='No yami')
-            return Response(status=status.HTTP_201_CREATED, data="successfully requested")
+            return Response(status=status.HTTP_201_CREATED, data=serializer.data.id)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
     def patch(self, request, *args, **kwargs):
