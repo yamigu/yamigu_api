@@ -77,9 +77,8 @@ class UserInfoView(APIView):
                 return Response(status=status.HTTP_400_BAD_REQUEST, data=None)
         serializer = ProfileSerializer(user)
         data = serializer.data
-        if kwargs.get('uid') != None:
-            data = dict(data)
-            data['friends'] = FriendListSerializer(user).data['friends']
+        data = dict(data)
+        data['friends'] = FriendListSerializer(user).data['friends']
         return Response(status=status.HTTP_200_OK, data=data)
 
 
