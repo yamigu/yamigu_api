@@ -3,7 +3,7 @@ from django.contrib.admin.widgets import AdminFileWidget
 from django.utils.safestring import mark_safe
 from .models import *
 from core.models import *
-
+from file_management.serializers import *
 from django.urls import reverse
 
 admin.site.register(Location)
@@ -41,7 +41,9 @@ class BVInline(EditLinkToInlineObject, admin.TabularInline):
     readonly_fields = ('bv_image',)
 
     def bv_image(self, obj):
-        return mark_safe('<img src="{url}" width="320px" />'.format(url=obj.image.last().data.src))
+
+        url = ImageSerializer(obj.image.last().data).data
+        return mark_safe('<img src="{url}" width="320px" />'.format(url=url['src']))
 
 
 class ProfileImageInline(admin.TabularInline):
