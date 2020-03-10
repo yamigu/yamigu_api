@@ -8,6 +8,8 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
 schema_view = get_schema_view(
     openapi.Info(
         title="yamigu API",
@@ -28,7 +30,7 @@ urlpatterns = [
     path('purchase/', include(purchase_url_patterns)),
     path('docs/', schema_view.with_ui('redoc',
                                       cache_timeout=0), name='schema-swagger-ui'),
-]
+] + staticfiles_urlpatterns()
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
