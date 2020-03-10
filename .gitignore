@@ -4,3 +4,4 @@ keys/
 *.pyc
 **/migrations/*
 .env
+staticfiles/
