@@ -654,7 +654,6 @@ class SendPushView(APIView):
                 data = json.loads(request.data['data'])
             except TypeError:
                 data = request.data['data']
-            print(data)
             firebase_message.send_push(user.id, data, is_chat=True)
             return Response(status=status.HTTP_200_OK)
         except MultiValueDictKeyError:
