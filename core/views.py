@@ -6,6 +6,7 @@ from .models import *
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from authorization.models import *
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils.datastructures import MultiValueDictKeyError
 from drf_yasg.utils import swagger_auto_schema
 from .serializers import *
 from django.db import IntegrityError
@@ -653,6 +654,7 @@ class SendPushView(APIView):
                 data = json.loads(request.data['data'])
             except TypeError:
                 data = request.data['data']
+            print(data)
             firebase_message.send_push(user.id, data, is_chat=True)
             return Response(status=status.HTTP_200_OK)
         except MultiValueDictKeyError:
