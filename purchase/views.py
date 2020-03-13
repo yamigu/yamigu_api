@@ -66,14 +66,13 @@ class OrderValidateAndroidView(APIView):
 class OrderValidateIOSView(APIView):
     # permission_classes = [IsAuthenticated]
 
-    def _get_key(re):
+    def _get_key(self, re):
         return re.purchase_date_ms
 
     def post(self, request, *args, **kwargs):
         payload = json.loads(request.data['payload'])
         transaction_id = payload['transactionId']
         raw_data = payload['transactionReceipt']
-        print(payload)
         # for sandbox environment.
         response = None
         try:
@@ -84,7 +83,6 @@ class OrderValidateIOSView(APIView):
                 response = itunesiap.verify(raw_data)  # base64-encoded data
         except:
             response = itunesiap.verify(raw_data)  # base64-encoded data
-        print(response)
         # 넘어온 in_app 영수증 리스트에서 구매 시각이 가장 마지막인 영수증을 가져와서 transaction_id를 비교한다.
         # 오름 차순으로 정렬해서 구매시각이 가장 마지막 영수증을 가져옵니다.
         receipts = sorted(response.receipt.in_app, key=self._get_key)
