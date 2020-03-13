@@ -77,14 +77,16 @@ class OrderValidateIOSView(APIView):
         raw_data = payload['transactionReceipt']
         # for sandbox environment.
         response = None
-        try:
-            if(request.data['env'] == 'sandbox'):
+        if(request.data['env'] == 'sandbox'):
+            with itunesiap.env.sandbox:
+                response = itunesiap.verify(raw_data)
+        else:
+            try:
+                response = itunesiap.verify(raw_data)  # base64-encoded data
+            except:
                 with itunesiap.env.sandbox:
                     response = itunesiap.verify(raw_data)
-            else:
-                response = itunesiap.verify(raw_data)  # base64-encoded data
-        except:
-            response = itunesiap.verify(raw_data)  # base64-encoded data
+
         # 넘어온 in_app 영수증 리스트에서 구매 시각이 가장 마지막인 영수증을 가져와서 transaction_id를 비교한다.
         # 오름 차순으로 정렬해서 구매시각이 가장 마지막 영수증을 가져옵니다.
         receipts = sorted(response.receipt.in_app, key=self._get_key)
