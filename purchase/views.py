@@ -70,7 +70,7 @@ class OrderValidateIOSView(APIView):
         return re.purchase_date_ms
 
     def post(self, request, *args, **kwargs):
-        payload = request.data['payload']
+        payload = json.loads(request.data['payload'])
         transaction_id = payload['transactionId']
         raw_data = payload['transactionReceipt']
         print(payload)
