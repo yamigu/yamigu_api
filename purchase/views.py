@@ -70,7 +70,9 @@ class OrderValidateIOSView(APIView):
         return re.purchase_date_ms
 
     def post(self, request, *args, **kwargs):
+        user = request.user
         payload = json.loads(request.data['payload'])
+        product_id = payload['productId']
         transaction_id = payload['transactionId']
         raw_data = payload['transactionReceipt']
         # for sandbox environment.
@@ -90,5 +92,12 @@ class OrderValidateIOSView(APIView):
         if last_receipt.transaction_id != transaction_id:
             #  구매시각이 가장 마지막인 영수증의 transaction_id 가 일치 하지 않는다.
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(status=status.HTTP_200_OK)
+        order = Order(
+            user=user,
+            product_id=product_id,
+            transaction_id=transaction_id,
+        )
+        order.save()
+        user.num_of_yami = user.num_of_yami + products[product_id]
+        user.save()
+        return Response(status=status.HTTP_200_OK, data=user.num_of_yami)
