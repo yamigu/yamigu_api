@@ -114,7 +114,7 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(BVImage, BVImageAdmin)
-
+admin.site.register(IdentityVerification)
 # class UserAdmin(admin.ModelAdmin):
 #     list_filter = ('is_certified',)
 #     list_display = ('id', 'uid', 'nickname', 'birth', 'gender_string', 'real_name', 'is_certified_string', 'yami')
