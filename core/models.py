@@ -137,6 +137,9 @@ class FeedRead(models.Model):
     class Meta:
         unique_together = ('feed', 'user')
 
+    def __str__(self):
+        return '{} read {}\'s feed'.format(self.user.nickname, self.feed.user.nickname)
+
 
 class Chat(models.Model):
     sender = models.ForeignKey(
