@@ -129,8 +129,8 @@ class FeedListView(APIView):
         serializer = FeedListSerializer(
             users, many=True, context={'user': user})
         if(user.image.count() == 0):
-            return Response(status=status.HTTP_200_OK, data=json.loads(random.shuffle(serializer.data)[:2]))
-        return Response(status=status.HTTP_200_OK, data=json.loads(random.shuffle(serializer.data)))
+            return Response(status=status.HTTP_200_OK, data=serializer.data[:2])
+        return Response(status=status.HTTP_200_OK, data=serializer.data[:5])
 
 
 class FeedView(APIView):
