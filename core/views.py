@@ -128,8 +128,8 @@ class FeedListView(APIView):
                 users = users.exclude(iv__phoneno=shield.phoneno)
         serializer = FeedListSerializer(
             users, many=True, context={'user': user})
-        if(user.image.count() == 0):
-            return Response(status=status.HTTP_200_OK, data=serializer.data[:2])
+        if(user.image.all().count() == 0):
+            return Response(status=status.HTTP_200_OK, data=serializer.data[:1])
         return Response(status=status.HTTP_200_OK, data=serializer.data[:5])
 
 
