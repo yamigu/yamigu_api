@@ -159,7 +159,7 @@ class FeedDeleteView(APIView):
         user = request.user
         feed = Feed.objects.get(id=kwargs.get('fid'))
         if user.feed.all().count() == 1:
-            return Response(status=status.HTTP_403_FORBIDDEN, data="last feed")    
+            return Response(status=status.HTTP_403_FORBIDDEN, data="last feed")
         feed.deleted_at = datetime.datetime.now()
         feed.save()
         return Response(status=status.HTTP_200_OK, data="successfully deleted")
@@ -266,6 +266,62 @@ class LikeView(APIView):
             like = Like(user=user, feed=feed)
             like.save()
         target_like_users = []
+
+        if(feed.user.like.count() == 1):
+            data = {
+                'title': '야미구',
+                'content': '축하해요, 누군가 첫번째로 좋아요를 눌렀어요!',
+                'clickAction': {
+                    'feed': True
+                },
+            }
+            firebase_message.send_push(feed.user.id, data)
+        elif(feed.user.like.count() == 3):
+            data = {
+                'title': '야미구',
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.count()),
+                'clickAction': {
+                    'feed': True
+                },
+            }
+            firebase_message.send_push(feed.user.id, data)
+        elif(feed.user.like.count() == 5):
+            data = {
+                'title': '야미구',
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.count()),
+                'clickAction': {
+                    'feed': True
+                },
+            }
+            firebase_message.send_push(feed.user.id, data)
+        elif(feed.user.like.count() == 10):
+            data = {
+                'title': '야미구',
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.count()),
+                'clickAction': {
+                    'feed': True
+                },
+            }
+            firebase_message.send_push(feed.user.id, data)
+        elif(feed.user.like.count() == 20):
+            data = {
+                'title': '야미구',
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.count()),
+                'clickAction': {
+                    'feed': True
+                },
+            }
+            firebase_message.send_push(feed.user.id, data)
+        elif(feed.user.like.count() == 30):
+            data = {
+                'title': '야미구',
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.count()),
+                'clickAction': {
+                    'feed': True
+                },
+            }
+            firebase_message.send_push(feed.user.id, data)
+
         for target_like in feed.user.like.all():
             if (target_like.value):
                 target_like_users.append(target_like.feed.user)
@@ -274,6 +330,14 @@ class LikeView(APIView):
             user.something_with.add(feed.user)
             user.save()
             serializer = ProfileSerializer(feed.user)
+            data = {
+                'title': '야미구',
+                'content':  "서로 좋아요한 친구가 생겼어요! 대화로 친해져보세요.",
+                'clickAction': {
+                    'feed': True
+                },
+            }
+            firebase_message.send_push(feed.user.id, data)
             return Response(status=status.HTTP_208_ALREADY_REPORTED, data=serializer.data)
 
         return Response(status=status.HTTP_201_CREATED, data="successfully created")
