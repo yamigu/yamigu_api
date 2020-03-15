@@ -268,8 +268,9 @@ class LikeView(APIView):
         target_like_users = []
         feeds = feed.user.feed.all()
         like_count = 0
-        for feed in feeds:
-            like_count = like_count + feed.like.all().count()
+        for feedd in feeds:
+            like_count = like_count + feedd.like.all().count()
+
         if(like_count == 1):
             data = {
                 'title': '야미구',
