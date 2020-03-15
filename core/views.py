@@ -210,12 +210,9 @@ class FeedReadView(APIView):
         user = request.user
         feed = Feed.objects.get(id=kwargs.get('fid'))
         feed_read = None
-        try:
-            feed_read = FeedRead(user=user, feed=feed,
-                                 read_on=datetime.datetime.now())
-        except IntegrityError:
-            feed_read = feed.feed_read.get(user=user)
-            feed_read.read_on = datetime.datetime.now()
+        feed_read, is_follow = FeedRead.objects.get_or_create(
+            user=user, feed=feed)
+        feed_read.read_on = datetime.datetime.now()
         feed_read.save()
         return Response(status=status.HTTP_200_OK, data="successfully read")
 
