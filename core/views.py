@@ -14,6 +14,7 @@ import datetime
 from fcm_django.models import FCMDevice
 from .utils import firebase_message
 import json
+import random
 
 
 class MatchRequestView(APIView):
@@ -127,7 +128,9 @@ class FeedListView(APIView):
                 users = users.exclude(iv__phoneno=shield.phoneno)
         serializer = FeedListSerializer(
             users, many=True, context={'user': user})
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        if(user.image.count() == 0):
+            return Response(status=status.HTTP_200_OK, data=random.shuffle(serializer.data)[:2])
+        return Response(status=status.HTTP_200_OK, data=random.shuffle(serializer.data))
 
 
 class FeedView(APIView):
