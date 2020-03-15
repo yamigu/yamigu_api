@@ -245,20 +245,24 @@ class BelongVerificationView(APIView):
                 'department': department,
                 'is_student': request.data['is_student'],
             }
-            serializer = BelongVerificationSerializer(data=data)
-            if serializer.is_valid():
-                TAG = "BV"
-                file_name = save_uploaded_file(request.data['image'], TAG)
-                image = Image(
-                    src=TAG + "/" + file_name
-                )
-                serializer.save()
-                bv_image = BVImage(
-                    bv=user.bv,
-                    data=image
-                )
-                bv_image.save()
-                return Response(status=status.HTTP_200_OK, data="successfully uploaded")
+            bv = BelongVerification(
+                user=user,
+                belong=request.data['belong'],
+                department=department,
+                is_student=True if request.data['is_student'] == 'true' else False
+            )
+            bv.save()
+            TAG = "BV"
+            file_name = save_uploaded_file(request.data['image'], TAG)
+            image = Image(
+                src=TAG + "/" + file_name
+            )
+            bv_image = BVImage(
+                bv=bv,
+                data=image
+            )
+            bv_image.save()
+            return Response(status=status.HTTP_200_OK, data="successfully uploaded")
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
