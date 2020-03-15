@@ -183,10 +183,10 @@ class ProfileImageView(APIView):
         feed_image.save()
         fserializer = FeedSerializer(feed)
         data["feed"] = fserializer.data
-        # if is_new:
-        #     user.num_of_yami = user.num_of_yami + 5
-        #     user.save()
-        #     data["bonus"] = 5
+        if is_new:
+            user.num_of_yami = user.num_of_yami + 5
+            user.save()
+            data["bonus"] = 5
         return Response(status=status.HTTP_200_OK, data=data)
 
 
@@ -209,6 +209,11 @@ class BelongVerificationView(APIView):
     @swagger_auto_schema(request_body=BelongVerificationSerializer, responses={200: "successfully uploaded", 400: "Bad Request"})
     def post(self, request, *args, **kwargs):
         user = request.user
+        department = None
+        try:
+            department = request.data['department']
+        except:
+            pass
         if(hasattr(user, 'bv')):
             TAG = "BV"
             file_name = save_uploaded_file(request.data['image'], TAG)
@@ -225,7 +230,7 @@ class BelongVerificationView(APIView):
 
             data = {
                 'belong': request.data['belong'],
-                'department': request.data['department'],
+                'department': department,
                 'is_student': request.data['is_student'],
             }
             serializer = BelongVerificationSerializer(user.bv, data=data)
