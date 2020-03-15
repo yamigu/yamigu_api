@@ -83,7 +83,7 @@ class Feed(models.Model):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return '{} - {}'.format(self.user.nickname, self.created_at.strftime('%Y/%m/%d %H:%M'))
+        return '{} {} - {}'.format(self.id, self.user.nickname, self.created_at.strftime('%Y/%m/%d %H:%M'))
 
 
 class Like(models.Model):
@@ -133,6 +133,9 @@ class FeedRead(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='read')
     read_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('feed', 'user')
 
 
 class Chat(models.Model):

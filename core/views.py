@@ -200,6 +200,26 @@ class FeedCreateView(APIView):
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 
+class FeedReadView(APIView):
+    """
+        피드 조회
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        feed = Feed.objects.get(id=kwargs.get('fid'))
+        feed_read = None
+        try:
+            feed_read = FeedRead(user=user, feed=feed,
+                                 read_on=datetime.datetime.now())
+        except IntegrityError:
+            feed_read = feed.feed_read.get(user=user)
+            feed_read.read_on = datetime.datetime.now()
+        feed_read.save()
+        return Response(status=status.HTTP_200_OK, data="successfully read")
+
+
 class ShieldView(APIView):
     """
         아는 사람 피하기
@@ -394,6 +414,13 @@ class BothLikeView(APIView):
             except:
                 pass
         serializer = ProfileSerializer(somethings, many=True)
+
+        for user_data in serializer.data:
+            user_data['has_new'] = False
+            user_obj = somethings.get(uid=user_data['uid'])
+            if user_obj.feed.last().read.filter(user=user).count() == 0:
+                user_data['has_new'] = True
+
         return Response(status=status.HTTP_200_OK, data=serializer.data)
 
 

@@ -8,6 +8,7 @@ urlpatterns = [
     path('feeds/', FeedListView.as_view()),
     path('feed/<uid>/', FeedView.as_view()),
     path('feed/<fid>/delete/', FeedDeleteView.as_view()),
+    path('feed/<fid>/read/', FeedReadView.as_view()),
     path('feed/', FeedCreateView.as_view()),
     path('shield/', ShieldView.as_view()),
     path('like/<fid>/', LikeView.as_view()),
