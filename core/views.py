@@ -350,6 +350,19 @@ class LikeView(APIView):
         if user in target_like_users:
             user.something_with.add(feed.user)
             user.save()
+            feed_read = None
+            try:
+                feed_read = FeedRead.objects.get(user=user, feed=feed)
+                feed_read.delete()
+            except:
+                pass
+            try:
+                feed_read2 = FeedRead.objects.get(
+                    user=feed.user, feed=user.feed.last())
+                feed_read2.delete()
+            except:
+                pass
+
             serializer = ProfileSerializer(feed.user)
             data = {
                 'title': '야미구',
@@ -417,8 +430,9 @@ class BothLikeView(APIView):
             user_obj = somethings.get(uid=user_data['uid'])
             if user_obj.feed.last().read.filter(user=user).count() == 0:
                 user_data['has_new'] = True
-
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        data = sorted(serializer.data,
+                      key=lambda user_data: user_data['has_new'], reverse=True)
+        return Response(status=status.HTTP_200_OK, data=data)
 
 
 class LikeCountView(APIView):
