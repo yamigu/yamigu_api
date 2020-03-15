@@ -5,6 +5,7 @@ from .models import *
 from core.models import *
 from file_management.serializers import *
 from django.urls import reverse
+import requests
 
 admin.site.register(Location)
 
@@ -75,6 +76,7 @@ class SentChatInline(admin.TabularInline):
 
 
 class UserAdmin(admin.ModelAdmin):
+    change_form_template = 'admin/change_form.html'
     search_fields = ('nickname', 'uid', 'real_name')
     readonly_fields = ('verified',)
     list_display = ('uid', 'nickname', 'personal_info', 'belong',
@@ -110,6 +112,23 @@ class UserAdmin(admin.ModelAdmin):
             return user.bv.department
         except:
             return ''
+
+    def response_change(self, request, obj):
+        if "certificate_accept" in request.POST:
+            obj.bv.verified = 2
+            obj.bv.save()
+            obj.num_of_yami = obj.num_of_yami + 5
+            obj.save()
+            data = {'user': obj.id}
+            res = requests.post(
+                "https://daepo.pe.kr/authorization/manager/certificate/user/accept/", data=data)
+        elif "certificate_decline" in request.POST:
+            obj.bv.verified = 0
+            obj.save()
+            data = {'user': obj.id}
+            res = requests.post(
+                "https://daepo.pe.kr/authorization/manager/certificate/user/decline/", data=data)
+        return super().response_change(request, obj)
 
 
 admin.site.register(User, UserAdmin)

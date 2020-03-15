@@ -16,6 +16,7 @@ from file_management.serializers import *
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from drf_yasg.utils import swagger_auto_schema
+from core.utils import firebase_message
 
 import firebase_admin
 from firebase_admin import auth
@@ -407,6 +408,40 @@ class WithdrawView(APIView):
         user.auth_token.delete()
         user.delete()
         return Response(status=status.HTTP_200_OK, data="successfully requested")
+
+
+class CertificateAcceptAdminView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.data['user'])
+        notification_content = "소속이 인증되었어요! 이제 자유롭게 대화할 수 있어요"
+        # print(notification_content)
+        notification_data = ""
+        push_data = {
+            'title': "야미구",
+            'content': notification_content,
+            'clickAction': {
+                'home': True
+            },
+        }
+        firebase_message.send_push(user.id, push_data)
+        return Response(data=None, status=status.HTTP_200_OK)
+
+
+class CertificateDeclineAdminView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(id=request.data['user'])
+        notification_content = "인증이 거절되었어요. 1:1 대화하기로 문의주세요"
+        # print(notification_content)
+        notification_data = ""
+        push_data = {
+            'title': "야미구",
+            'content': notification_content,
+            'clickAction': {
+                'home': True
+            },
+        }
+        firebase_message.send_push(user.id, push_data)
+        return Response(data=None, status=status.HTTP_200_OK)
 
 
 class KakaoLoginView(SocialLoginView):
