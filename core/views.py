@@ -266,8 +266,11 @@ class LikeView(APIView):
             like = Like(user=user, feed=feed)
             like.save()
         target_like_users = []
-
-        if(feed.user.like.all().count() == 1):
+        feeds = feed.user.feed.all()
+        like_count = 0
+        for feed in feeds:
+            like_count = like_count + feed.like.all().count()
+        if(like_count == 1):
             data = {
                 'title': '야미구',
                 'content': '축하해요, 누군가 첫번째로 좋아요를 눌렀어요!',
@@ -276,46 +279,46 @@ class LikeView(APIView):
                 },
             }
             firebase_message.send_push(feed.user.id, data)
-        elif(feed.user.like.all().count() == 3):
+        elif(like_count == 3):
             data = {
                 'title': '야미구',
-                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.all().count()),
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(like_count),
                 'clickAction': {
                     'feed': True
                 },
             }
             firebase_message.send_push(feed.user.id, data)
-        elif(feed.user.like.all().count() == 5):
+        elif(like_count == 5):
             data = {
                 'title': '야미구',
-                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.all().count()),
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(like_count),
                 'clickAction': {
                     'feed': True
                 },
             }
             firebase_message.send_push(feed.user.id, data)
-        elif(feed.user.like.all().count() == 10):
+        elif(like_count == 10):
             data = {
                 'title': '야미구',
-                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.all().count()),
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(like_count),
                 'clickAction': {
                     'feed': True
                 },
             }
             firebase_message.send_push(feed.user.id, data)
-        elif(feed.user.like.all().count() == 20):
+        elif(like_count == 20):
             data = {
                 'title': '야미구',
-                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.all().count()),
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(like_count),
                 'clickAction': {
                     'feed': True
                 },
             }
             firebase_message.send_push(feed.user.id, data)
-        elif(feed.user.like.all().count() == 30):
+        elif(like_count == 30):
             data = {
                 'title': '야미구',
-                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(feed.user.like.all().count()),
+                'content':  "{}개의 좋아요를 받았어요, 친구를 찾아보세요!".format(like_count),
                 'clickAction': {
                     'feed': True
                 },
