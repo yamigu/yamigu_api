@@ -156,7 +156,10 @@ class FeedDeleteView(APIView):
 
     @swagger_auto_schema(responses={200: 'successfully deleted'})
     def patch(self, request, *args, **kwargs):
+        user = request.user
         feed = Feed.objects.get(id=kwargs.get('fid'))
+        if user.feed.all().count() == 1:
+            return Response(status=status.HTTP_403_FORBIDDEN, data="last feed")    
         feed.deleted_at = datetime.datetime.now()
         feed.save()
         return Response(status=status.HTTP_200_OK, data="successfully deleted")
