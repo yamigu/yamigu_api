@@ -124,7 +124,7 @@ class UserAdmin(admin.ModelAdmin):
                 res = requests.post(
                     "https://daepo.pe.kr/authorization/manager/certificate/user/accept/", data=data)
             except:
-                return
+                pass
         elif "certificate_decline" in request.POST:
             try:
                 obj.bv.image.is_checked = False
@@ -133,7 +133,7 @@ class UserAdmin(admin.ModelAdmin):
                 res = requests.post(
                     "https://daepo.pe.kr/authorization/manager/certificate/user/decline/", data=data)
             except:
-                return
+                pass
         return super().response_change(request, obj)
 
 
