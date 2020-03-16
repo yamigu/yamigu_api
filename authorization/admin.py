@@ -6,7 +6,7 @@ from core.models import *
 from file_management.serializers import *
 from django.urls import reverse
 import requests
-
+import datetime
 admin.site.register(Location)
 
 
@@ -114,21 +114,24 @@ class UserAdmin(admin.ModelAdmin):
             return ''
 
     def response_change(self, request, obj):
-        if "certificate_accept" in request.POST:
+        if 'certificate_accept' in request.POST:
+            print('인증하기')
             try:
-                obj.bv.image.is_checked = True
-                obj.bv.image.save()
+                obj.bv.image.last().is_checked = True
+                obj.bv.image.last().checked_on = datetime.datetime.now()
+                obj.bv.image.last().save()
                 obj.num_of_yami = obj.num_of_yami + 5
                 obj.save()
                 data = {'user': obj.id}
                 res = requests.post(
                     "https://daepo.pe.kr/authorization/manager/certificate/user/accept/", data=data)
-            except:
-                pass
+            except Exception as e:
+                print(e)
         elif "certificate_decline" in request.POST:
             try:
-                obj.bv.image.is_checked = False
-                obj.bv.image.save()
+                print('인증 거절하기')
+                obj.bv.image.last().is_checked = False
+                obj.bv.image.last().save()
                 data = {'user': obj.id}
                 res = requests.post(
                     "https://daepo.pe.kr/authorization/manager/certificate/user/decline/", data=data)
