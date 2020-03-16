@@ -115,23 +115,24 @@ class UserAdmin(admin.ModelAdmin):
 
     def response_change(self, request, obj):
         if 'certificate_accept' in request.POST:
-            print('인증하기')
             try:
-                obj.bv.image.last().is_checked = True
-                obj.bv.image.last().checked_on = datetime.datetime.now()
-                obj.bv.image.last().save()
+                bv_image = obj.bv.image.last()
+                bv_image.is_checked = True
+                bv_image.checked_on = datetime.datetime.now()
+                bv_image.save()
                 obj.num_of_yami = obj.num_of_yami + 5
                 obj.save()
                 data = {'user': obj.id}
-                res = requests.post(
-                    "https://daepo.pe.kr/authorization/manager/certificate/user/accept/", data=data)
+                # res = requests.post(
+                #     "https://daepo.pe.kr/authorization/manager/certificate/user/accept/", data=data)
             except Exception as e:
                 print(e)
         elif "certificate_decline" in request.POST:
             try:
-                print('인증 거절하기')
-                obj.bv.image.last().is_checked = False
-                obj.bv.image.last().save()
+                bv_image = obj.bv.image.last()
+                bv_image.is_declined = True
+                bv_image.declined_on = datetime.datetime.now()
+                bv_image.save()
                 data = {'user': obj.id}
                 res = requests.post(
                     "https://daepo.pe.kr/authorization/manager/certificate/user/decline/", data=data)
