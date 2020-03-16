@@ -123,8 +123,8 @@ class UserAdmin(admin.ModelAdmin):
                 obj.num_of_yami = obj.num_of_yami + 5
                 obj.save()
                 data = {'user': obj.id}
-                # res = requests.post(
-                #     "https://daepo.pe.kr/authorization/manager/certificate/user/accept/", data=data)
+                res = requests.post(
+                    "https://daepo.pe.kr/authorization/manager/certificate/user/accept/", data=data)
             except Exception as e:
                 print(e)
         elif "certificate_decline" in request.POST:
