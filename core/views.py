@@ -542,7 +542,7 @@ class FriendRequestView(APIView):
             fr.save()
             friend = fr.requestor.user
             friend.num_of_yami = friend.num_of_yami + 10
-            friend.num_of_yami.save()
+            friend.save()
             return Response(status=status.HTTP_202_ACCEPTED, data="successfully approved")
         elif action == 'DECLINE':
             fr.declined_on = datetime.datetime.now()
