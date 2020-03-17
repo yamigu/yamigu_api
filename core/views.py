@@ -7,12 +7,14 @@ from file_management.utils.file_helper import save_uploaded_file, rotate_image, 
 from authorization.models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.datastructures import MultiValueDictKeyError
+from rest_framework import generics
 from drf_yasg.utils import swagger_auto_schema
 from .serializers import *
 from django.db import IntegrityError
 import datetime
 from fcm_django.models import FCMDevice
 from .utils import firebase_message
+from .pagination import SmallPagesPagination
 import json
 import random
 
@@ -98,13 +100,14 @@ class MatchRequestView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
 
-class FeedListView(APIView):
+class FeedListView(generics.ListAPIView):
     """
         피드 List
 
         ---
     """
     permission_classes = [IsAuthenticated]
+    pagination_class = SmallPagesPagination
 
     @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
@@ -129,7 +132,8 @@ class FeedListView(APIView):
         serializer = FeedListSerializer(
             users, many=True, context={'user': user})
         shuffled = random.sample(serializer.data, len(serializer.data))
-        return Response(status=status.HTTP_200_OK, data=shuffled)
+        page = self.paginate_queryset(shuffled)
+        return self.get_paginated_response(page)
 
 
 class FeedView(APIView):
