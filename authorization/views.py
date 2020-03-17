@@ -9,7 +9,7 @@ from rest_auth.registration.views import SocialLoginView
 from .serializers import *
 from .models import *
 from core.models import Feed, FeedImage
-from core.serializers import FeedSerializer, FriendListSerializer
+from core.serializers import FeedSerializer, FriendListSerializer, FriendRequestNotAprListSerializer
 from file_management.utils.file_helper import save_uploaded_file, rotate_image, get_file_path
 from file_management.models import *
 from file_management.serializers import *
@@ -87,8 +87,8 @@ class UserInfoView(APIView):
         try:
             data['new_friend_requests'] = FriendRequestNotAprListSerializer(
                 user).data['count']
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
         return Response(status=status.HTTP_200_OK, data=data)
 
 
