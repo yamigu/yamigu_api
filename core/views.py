@@ -116,14 +116,20 @@ class FeedListView(generics.ListAPIView):
         users = users.exclude(is_staff=True)  # exclude manager
         users = users.exclude(nickname__isnull=True)  # exclude no Nickname
         users = users.exclude(iv__isnull=True)  # exclude no IV
+
         something_id = []
         blocked_id = []
+        nofeeds_id = []
         for something in user.something_with.all():
             something_id.append(something.id)
         for blocked in user.disconnected_with.all():
             blocked_id.append(blocked.id)
+        for obj in users:
+            if(obj.feed.all().count() == 0):
+                nofeeds_id.append(obj.id)
         users = users.exclude(id__in=something_id)
         users = users.exclude(id__in=blocked_id)
+        users = users.exclude(id__in=nofeeds_id)
         shields = user.shield.all()
 
         if shields.count() > 0:
