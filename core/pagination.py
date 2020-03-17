@@ -1,11 +1,22 @@
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
 import random
+
+DEFAULT_PAGE = 0
 
 
 class SmallPagesPagination(PageNumberPagination):
     page_size = 5
 
-    def page(self, number):
-        page = super(ShuffledPaginator, self).page(number)
-        random.shuffle(page.object_list)
-        return page
+    def get_paginated_response(self, data):
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'total': self.page.paginator.count,
+            'page': int(self.request.GET.get('page', DEFAULT_PAGE)),
+            'page_size': int(self.request.GET.get('page_size', self.page_size)),
+            'results': random.sample(data, len(data))
+        })
