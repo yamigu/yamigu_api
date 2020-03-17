@@ -524,8 +524,8 @@ class FriendRequestView(APIView):
             if(friend_request.deleted_on != None):
                 friend_request.approved_on = None
                 friend_request.deleted_on = None
-            if(friend_request.declined_on != None):
-                friend_request.declined_on = None
+            if(friend_request.canceled_on != None):
+                friend_request.canceled_on = None
             friend_request.save()
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         except IntegrityError:
