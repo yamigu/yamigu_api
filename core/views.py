@@ -517,7 +517,7 @@ class FriendRequestView(APIView):
                     raise IntegrityError
             except ObjectDoesNotExist:
                 pass
-            friend_request = FriendRequest.objects.get_or_create(
+            friend_request, is_follow2 = FriendRequest.objects.get_or_create(
                 requestor=requestor_iv,
                 requestee=requestee_iv
             )
