@@ -137,8 +137,7 @@ class FeedListView(generics.ListAPIView):
                 users = users.exclude(iv__phoneno=shield.phoneno)
         serializer = FeedListSerializer(
             users, many=True, context={'user': user})
-        shuffled = random.sample(serializer.data, len(serializer.data))
-        page = self.paginate_queryset(shuffled)
+        page = self.paginate_queryset(serializer.data)
         return self.get_paginated_response(page)
 
 
