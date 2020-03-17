@@ -572,7 +572,7 @@ class ChatDetailView(APIView):
     def get(self, request, *args, **kwargs):
         chat = Chat.objects.get(id=kwargs.get('rid'))
         try:
-            serializer = ChatSerializer(chat)
+            serializer = ChatDetailSerializer(chat)
             return Response(status=status.HTTP_200_OK, data=serializer.data)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
