@@ -480,12 +480,12 @@ class FriendView(APIView):
             request_list = []
             if hasattr(user.iv, 'received_request'):
                 received_list = user.iv.received_request.filter(
-                    declined_on__isnull=True, canceled_on__isnull=True)
+                    declined_on__isnull=True, canceled_on__isnull=True, deleted_on__isnull=True)
                 request_list.extend(received_list)
 
             if hasattr(user.iv, 'sent_request'):
                 sent_list = user.iv.sent_request.filter(
-                    declined_on__isnull=True, canceled_on__isnull=True)
+                    declined_on__isnull=True, canceled_on__isnull=True, deleted_on__isnull=True)
                 request_list.extend(sent_list)
             serializer = FriendRequestSerializer(
                 request_list, many=True, context={'user': user})
