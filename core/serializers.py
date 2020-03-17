@@ -119,7 +119,7 @@ class FriendRequestSerializer(ModelSerializer):
 
 class FriendRequestPatchSerializer(Serializer):
     id = IntegerField(help_text='FriendRequest\'s ID')
-    action = CharField(help_text='APPROVE or DELETE or CANCEL')
+    action = CharField(help_text='APPROVE or DECLINE or DELETE or CANCEL')
 
 
 class FriendListSerializer(ModelSerializer):

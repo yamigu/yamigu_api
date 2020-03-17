@@ -506,11 +506,9 @@ class FriendRequestView(APIView):
         user = request.user
         requestor_iv = user.iv
         requestee_iv = None
-        try:
-            requestee_iv = IdentityVerification.objects.get(phoneno=phoneno)
-        except ObjectDoesNotExist:
-            requestee_iv = IdentityVerification(phoneno=phoneno)
-            requestee_iv.save()
+        requestee_iv, is_follow = IdentityVerification.objects.get_or_create(
+            phoneno=phoneno)
+        requestee_iv.save()
         try:
             try:
                 veri = requestor_iv.received_request.get(
@@ -519,10 +517,12 @@ class FriendRequestView(APIView):
                     raise IntegrityError
             except ObjectDoesNotExist:
                 pass
-            friend_request = FriendRequest(
+            friend_request = FriendRequest.objects.get_or_create(
                 requestor=requestor_iv,
                 requestee=requestee_iv
             )
+            if(friend_request.deleted_on != None):
+                friend_request.deleted_on = None
             friend_request.save()
             return Response(status=status.HTTP_201_CREATED, data="successfully requested")
         except IntegrityError:
@@ -538,8 +538,12 @@ class FriendRequestView(APIView):
             fr.approved_on = datetime.datetime.now()
             fr.save()
             return Response(status=status.HTTP_202_ACCEPTED, data="successfully approved")
-        elif action == 'DELETE':
+        elif action == 'DECLINE':
             fr.declined_on = datetime.datetime.now()
+            fr.save()
+            return Response(status=status.HTTP_202_ACCEPTED, data="successfully declined")
+        elif action == 'DELETE':
+            fr.deleted_on = datetime.datetime.now()
             fr.save()
             return Response(status=status.HTTP_202_ACCEPTED, data="successfully deleted")
         elif action == 'CANCEL':

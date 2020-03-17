@@ -13,6 +13,7 @@ class FriendRequest(models.Model):
     approved_on = models.DateTimeField(blank=True, null=True)
     declined_on = models.DateTimeField(blank=True, null=True)
     canceled_on = models.DateTimeField(blank=True, null=True)
+    deleted_on = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         unique_together = ('requestee', 'requestor')
