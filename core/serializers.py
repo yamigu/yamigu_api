@@ -122,6 +122,19 @@ class FriendRequestPatchSerializer(Serializer):
     action = CharField(help_text='APPROVE or DECLINE or DELETE or CANCEL')
 
 
+class FriendRequestNotAprListSerializer(Serializer):
+    count = SerializerMethodField('get_requests')
+
+    def get_requests(self, user):
+        received_request = []
+        sent_request = []
+        return user.iv.received_request.filter(approved_on__isnull=True).count()
+
+    class Meta:
+        model = User
+        fields = ('count', )
+
+
 class FriendListSerializer(ModelSerializer):
     friends = SerializerMethodField('get_friends')
 

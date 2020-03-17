@@ -84,6 +84,11 @@ class UserInfoView(APIView):
             data['friends'] = FriendListSerializer(user).data['friends']
         except Exception:
             pass
+        try:
+            data['new_friend_requests'] = FriendRequestNotAprListSerializer(
+                user).data['count']
+        except Exception:
+            pass
         return Response(status=status.HTTP_200_OK, data=data)
 
 
