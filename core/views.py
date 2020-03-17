@@ -16,7 +16,6 @@ from fcm_django.models import FCMDevice
 from .utils import firebase_message
 from .pagination import SmallPagesPagination
 import json
-import random
 
 
 class MatchRequestView(APIView):
