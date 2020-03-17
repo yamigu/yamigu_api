@@ -561,6 +561,24 @@ class FriendRequestView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
 
 
+class ChatDetailView(APIView):
+    """
+        채팅 디테일
+
+        ---
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        chat = Chat.objects.get(id=kwargs.get('rid'))
+        try:
+            serializer = ChatSerializer(chat)
+            return Response(status=status.HTTP_200_OK, data=serializer.data)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=str(e))
+        return Response(status=status.HTTP_400_BAD_REQUEST, data="Bad Request")
+
+
 class ChatView(APIView):
     """
         채팅

@@ -178,6 +178,12 @@ class ChatSerializer(ModelSerializer):
                             'canceled_on', 'approved_on')
 
 
+class ChatSerializer(ModelSerializer):
+    class Meta:
+        model = Chat
+        fields = '__all__'
+
+
 class ChatListSerializer(ModelSerializer):
     chat_list = SerializerMethodField('get_chat_list')
 
