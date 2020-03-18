@@ -3,6 +3,8 @@ from django.core.exceptions import ValidationError
 from authorization.models import User, IdentityVerification
 from file_management.models import Image
 
+from django.utils.timezone import now
+
 
 class FriendRequest(models.Model):
     requestee = models.ForeignKey(
@@ -65,14 +67,23 @@ class MatchRequest(models.Model):
     date_selected = models.SmallIntegerField(default=0)
     min_age = models.SmallIntegerField(default=20)
     max_age = models.SmallIntegerField(default=30)
-    requested_on = models.DateTimeField(auto_now_add=True, blank=True)
+    requested_on = models.DateTimeField(default=now)
     matched_with = models.OneToOneField(
         "self", on_delete=models.SET_NULL, related_name="+", null=True, blank=True)
     matched_on = models.DateTimeField(null=True, blank=True)
     status = models.IntegerField(default=0)
 
     def __str__(self):
-        return '{} - {} - {}'.format(self.user.nickname, self.requested_on.strftime('%Y/%m/%d %H:%M'), self.status)
+        status = ''
+        if(self.status == 1):
+            status = '매칭 중(무료)'
+        elif(self.status == 2):
+            status = '매칭 완료'
+        elif(self.status == 3):
+            status = '매칭 취소'
+        elif(self.status == 4):
+            status = '매칭 중(야미)'
+        return '{} - {} - {}'.format(self.user.nickname, self.requested_on.strftime('%Y/%m/%d %H:%M'), status)
 
 
 class Feed(models.Model):
