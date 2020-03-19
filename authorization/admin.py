@@ -7,7 +7,9 @@ from file_management.serializers import *
 from django.urls import reverse
 import requests
 import datetime
-admin.site.register(Location)
+from core.admin import admin_site
+
+admin_site.register(Location)
 
 
 class IVInline(admin.TabularInline):
@@ -87,8 +89,13 @@ class UserAdmin(admin.ModelAdmin):
                RecvChatInline, SentChatInline)
 
     def personal_info(self, user):
+        gender = ''
+        if(user.iv.gender == 0):
+            gender = '여'
+        elif(user.iv.gender == 1):
+            gender = '남'
         try:
-            return '{}({})'.format(user.iv.realname, user.iv.birthdate)
+            return '{}({}, {})'.format(user.iv.realname, user.iv.birthdate, gender)
         except:
             return ''
 
@@ -141,9 +148,9 @@ class UserAdmin(admin.ModelAdmin):
         return super().response_change(request, obj)
 
 
-admin.site.register(User, UserAdmin)
-admin.site.register(BVImage, BVImageAdmin)
-admin.site.register(IdentityVerification)
+admin_site.register(User, UserAdmin)
+admin_site.register(BVImage, BVImageAdmin)
+admin_site.register(IdentityVerification)
 # class UserAdmin(admin.ModelAdmin):
 #     list_filter = ('is_certified',)
 #     list_display = ('id', 'uid', 'nickname', 'birth', 'gender_string', 'real_name', 'is_certified_string', 'yami')
@@ -172,4 +179,4 @@ admin.site.register(IdentityVerification)
 #     gender_string.short_description = "성별"
 
 
-# admin.site.register(User, UserAdmin)
+# admin_site.register(User, UserAdmin)
