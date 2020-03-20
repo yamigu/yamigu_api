@@ -861,7 +861,11 @@ def selectOptions(mr):
     DAY_STRING = ['월', '화', '수', '목', '금', '토', '일']
     PERSONNEL_STRING = ['2:2', '3:3', '4:4']
     DATE_STRING = ['', '', '', '', '', '', '', '금요일', '토요일']
-
+    today = datetime.datetime.today()
+    for i in range(1, 8):
+        the_day = today + datetime.timedelta(i)
+        DATE_STRING[i-1] = the_day.strftime(
+            '%m월%d일') + '({})'.format(DAY_STRING[the_day.weekday()])
     personnel_int = mr.personnel_selected
     date_int = mr.date_selected
     requested_on = mr.requested_on
@@ -895,6 +899,8 @@ def MatchRequestQueueView(request):
     DAY_STRING = ['월', '화', '수', '목', '금', '토', '일']
     PERSONNEL_STRING = ['2:2', '3:3', '4:4']
     DATE_STRING = ['', '', '', '', '', '', '', '금요일', '토요일']
+    today = datetime.datetime.today()
+
     if request.method == "POST":
         woman = MatchRequest.objects.get(id=request.POST['woman'])
         man = MatchRequest.objects.get(id=request.POST['man'])
@@ -902,11 +908,11 @@ def MatchRequestQueueView(request):
 
         woman.matched_with = man
         woman.matched_on = now
-        # woman.status = MatchRequest.STATUS_CODE_MATCHED
+        woman.status = MatchRequest.STATUS_CODE_MATCHED
 
         man.matched_with = woman
         man.matched_on = now
-        # man.status = MatchRequest.STATUS_CODE_MATCHED
+        man.status = MatchRequest.STATUS_CODE_MATCHED
 
         man_user = man.user
         woman_user = woman.user
@@ -957,9 +963,9 @@ def MatchRequestQueueView(request):
                     intersection = man_personnel_selected_set & woman_personnel_selected_set
                     selected_personnel_option = list(intersection)
 
-                if(len(man_date_selected) == 0):  # 남자 인원 상관없음
+                if(len(man_date_selected) == 0):  # 남자 날짜 상관없음
                     selected_date_option = woman_date_selected
-                elif(len(woman_date_selected) == 0):  # 여자 인원 상관없음
+                elif(len(woman_date_selected) == 0):  # 여자 날짜 상관없음
                     selected_date_option = man_date_selected
                 else:
                     man_date_selected_set = set(man_date_selected)
@@ -967,6 +973,7 @@ def MatchRequestQueueView(request):
                         woman_date_selected)
                     intersection = man_date_selected_set & woman_date_selected_set
                     selected_date_option = list(intersection)
+
                 selected_personnel_option_string = ''
                 selected_date_option_string = ''
                 for idx, option in enumerate(selected_personnel_option):
@@ -977,10 +984,10 @@ def MatchRequestQueueView(request):
                     if idx > 0:
                         selected_date_option_string = selected_date_option_string + ', '
                     selected_date_option_string = selected_date_option_string + option
-                if(len(selected_personnel_option)):
-                    selected_personnel_option_string = "날짜 상관 없음"
-                if(len(selected_date_option)):
-                    selected_date_option_string = "인원 상관 없음"
+                if(len(selected_personnel_option) == 0):
+                    selected_personnel_option_string = "인원 상관 없음"
+                if(len(selected_date_option) == 0):
+                    selected_date_option_string = "날짜 상관 없음"
                 manager_message = "안녕하세요 :) 미팅 주선이 완료되어 채팅방으로 연결되었어요!\n\n남: {} {}살\n여: {} {}살\n- {}\n- {}\n\n서로 매너있는 대화 부탁드려요!\n약속을 잡고 즐거운 미팅하시길 바래요! 감사합니다.".format(
                     man_belong, man_age, woman_belong, woman_age, selected_personnel_option_string, selected_date_option_string)
                 firebase_message.send_push(man_user.id, push_data)
@@ -994,9 +1001,7 @@ def MatchRequestQueueView(request):
     users = User.objects.all()
     man_requests = []
     woman_requests = []
-
-    today = datetime.datetime.today()
-    for i in range(1, 7):
+    for i in range(1, 8):
         the_day = today + datetime.timedelta(i)
         DATE_STRING[i-1] = the_day.strftime(
             '%m월%d일') + '({})'.format(DAY_STRING[the_day.weekday()])
