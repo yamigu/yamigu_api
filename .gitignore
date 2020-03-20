@@ -4,6 +4,5 @@ keys/
 *.pyc
 **/migrations/*
 .env
-static/
 staticfiles/
 *.log
