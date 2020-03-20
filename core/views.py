@@ -897,10 +897,8 @@ def MatchRequestQueueView(request):
                 manager_message = "안녕하세요 :) 미팅 주선이 완료되어 채팅방으로 연결되었어요!\n\n남: 연세대 24살\n여: 이화여대 전기전자공학부 22살\n- 2:2 미팅, 3:3 미팅\n- 날짜 상관 없음\n\n서로 매너있는 대화 부탁드려요!\n약속을 잡고 즐거운 미팅하시길 바래요! 감사합니다."
                 firebase_message.send_push(man_user.id, push_data)
                 firebase_message.send_message(
-                    man_user.id, chat.id, manager_message)
+                    [man_user, woman_user], chat.id, manager_message)
                 # firebase_message.send_push(woman_user.id, data)
-                firebase_message.send_message(
-                    woman_user.id, chat.id, manager_message)
             except ValidationError:
                 pass
         else:
