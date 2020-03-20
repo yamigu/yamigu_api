@@ -29,7 +29,7 @@ class BVEditLinkToInlineObject(object):
 
 class BVInline(BVEditLinkToInlineObject, admin.TabularInline):
     model = BelongVerification
-    readonly_fields = ('bv_image', 'edit_link')
+    readonly_fields = ('bv_image',)
 
     def bv_image(self, obj):
 

@@ -34,7 +34,7 @@ def send_push_thread(user_id, data, is_chat=False):
     #             data=data, title=data['title'], body=data['content'], badge=badge)
 
 
-def send_notification_thread(uid, notification_type, content, data):
+def send_message(user_id, room_id, content):
     ref = db.reference('user/{}/notifications'.format(uid))
     key = ref.push().key
     ref.child(key).set({
@@ -53,7 +53,7 @@ def send_push(user_id, data, is_chat=False):
     t.start()
 
 
-def send_notification(uid, notification_type, content, data):
-    t = threading.Thread(target=send_notification_thread,
-                         args=(uid, notification_type, content, data))
+def send_message(user_id, room_id, content):
+    t = threading.Thread(target=send_message_thread,
+                         args=(user_id, room_id, content))
     t.start()

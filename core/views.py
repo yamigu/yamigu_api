@@ -872,13 +872,7 @@ def MatchRequestQueueView(request):
 
         man_user = man.user
         woman_user = woman.user
-        push_data = {
-            'title': '야미구',
-            'content': '미팅 주선이 완료되었어요!',
-            'clickAction': {
-                'feed': True
-            },
-        }
+
         data = {
             'sender': man_user.id,
             'receiver': woman_user.id,
@@ -889,9 +883,16 @@ def MatchRequestQueueView(request):
         serializer = ChatCreateSerializer(data=data)
         if serializer.is_valid():
             try:
-                serializer.save()
+                chat = serializer.save()
                 woman.save()
                 man.save()
+                push_data = {
+                    'title': '야미구',
+                    'content': '미팅 주선이 완료되었어요!',
+                    'clickAction': {
+                        'roomId': chat.id
+                    },
+                }
                 firebase_message.send_push(man_user.id, push_data)
                 # firebase_message.send_push(woman_user.id, data)
             except ValidationError:
