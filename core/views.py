@@ -942,9 +942,11 @@ def MatchRequestQueueView(request):
                     woman)
                 man_belong = ''
                 woman_belong = ''
-                man_belong = man_user.bv.belong + \
+                man_belong = man_user.bv.belong
+                man_belong = man_belong + \
                     (' ' + man_user.bv.department) if man_user.bv.department != None else ''
-                woman_belong = woman_user.bv.belong + \
+                woman_belong = woman_user.bv.belong
+                woman_belong = woman_belong + \
                     (' ' + woman_user.bv.department) if woman_user.bv.department != None else ''
                 man_age = datetime.datetime.today().year - \
                     int(man_user.iv.birthdate[:4]) + 1
