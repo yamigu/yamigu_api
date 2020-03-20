@@ -187,7 +187,7 @@ class ChatSerializer(ModelSerializer):
     class Meta:
         model = Chat
         fields = ('id', 'sender', 'receiver', 'created_at', 'chat_type',
-                  'declined_on', 'canceled_on', 'approved_on')
+                  'declined_on', 'canceled_on', 'approved_on', 'greet')
         read_only_fields = ('id', 'sender', 'receiver', 'chat_type', 'created_at', 'declined_on',
                             'canceled_on', 'approved_on')
 
