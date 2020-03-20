@@ -191,7 +191,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 cred = firebase_admin.credentials.Certificate(
     os.path.join(BASE_DIR, 'credentials.json'))
-default_app = firebase_admin.initialize_app(cred)
+default_app = firebase_admin.initialize_app(
+    cred,  {'databaseURL': env('FIREBASE_DB_URL')})
 
 GOOGLE_KEY_STORE = os.path.join(
     BASE_DIR, "keys") + '/api-7596831323571844011-92784-e6fdb9161dce.json'
