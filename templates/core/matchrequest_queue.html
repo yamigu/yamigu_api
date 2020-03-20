@@ -1,10 +1,14 @@
 {% load static %}
 {% load match_extras %} 
+{% load i18n %}
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+<title>야미구 미팅 주선</title>
 </head>
 <body>
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
 {% block content %}
 <div class="container">
 

@@ -78,7 +78,7 @@ class SentChatInline(admin.TabularInline):
 
 
 class UserAdmin(admin.ModelAdmin):
-    change_form_template = 'admin/change_form.html'
+    change_form_template = 'admin/authorization/change_form.html'
     search_fields = ('nickname', 'uid', 'real_name')
     readonly_fields = ('verified',)
     list_display = ('uid', 'nickname', 'personal_info', 'belong',

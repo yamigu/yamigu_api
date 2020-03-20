@@ -8,7 +8,8 @@ from file_management.utils.file_helper import save_uploaded_file, rotate_image, 
 from authorization.models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.datastructures import MultiValueDictKeyError
-
+from django.urls import reverse
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework import generics
 from django.views.generic import ListView
@@ -995,7 +996,9 @@ def MatchRequestQueueView(request):
                 firebase_message.send_push(man_user.id, push_data)
                 firebase_message.send_message(
                     [man_user, woman_user], chat.id, manager_message)
-                # firebase_message.send_push(woman_user.id, data)
+                firebase_message.send_push(woman_user.id, data)
+                chat.delete()
+                return HttpResponseRedirect(reverse('customadmin:admin-matching'))
             except ValidationError:
                 pass
         else:

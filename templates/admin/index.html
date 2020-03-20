@@ -1,0 +1,7 @@
+{% extends "admin/index.html" %} 
+{% block breadcrumbs %}
+{{block.super }}
+<form method="GET" action="core/meetings">
+  <input type="submit" value="미팅 주선" />
+</form>
+{% endblock %}

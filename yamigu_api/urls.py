@@ -24,6 +24,7 @@ schema_view = get_schema_view(
     validators=['flex', 'ssv'],
     public=True,
 )
+admin.site.index_template = "admin/index.html"
 urlpatterns = [
     path('admin/', admin_site.urls),
     path('admin2/', admin.site.urls),

@@ -10,7 +10,7 @@ class CustomAdminSite(admin.AdminSite):
         urls = super(CustomAdminSite, self).get_urls()
         custom_urls = [
             path('core/meetings/',
-                 self.admin_view(MatchRequestQueueView)),
+                 self.admin_view(MatchRequestQueueView), name="admin-matching"),
         ]
         return urls + custom_urls
 
