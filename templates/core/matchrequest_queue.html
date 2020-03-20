@@ -1,0 +1,375 @@
+{% load static %}
+{% load match_extras %} 
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+<body>
+{% block content %}
+<div class="container">
+
+<div class="left-wrapper">
+    <div class="left-header">
+        <h1>
+        미팅 주선 대기 리스트
+        </h1>
+    </div>
+    <div class="left">
+        <span>
+        <h2>여자</h2>
+        <ul>
+        {% if woman_requests|length == 0 %}
+        <li>대기 인원이 없습니다.<li>
+        {% else %}
+        {% for item in woman_requests %}
+        <li>
+            <div class="profile-card woman" data-id="{{item.index}}">
+                <div>
+                    <img class="img" src={{item.avata}} width=200 height=200/>
+                </div>
+                <div class="profile">
+                {{ item.nickname }} ({{ item.age }}, {{ item.belong }}
+                {% if item.department|length != 0 %}
+                {{ item.department }}
+                {% endif %}
+                )
+                </div>
+                <div class="request-personnel">
+                {% if item.request_info.personnel|length == 0%}
+                인원상관없음
+                {% endif %}
+                {% for selected in item.request_info.personnel %}
+                    <div>
+                    {{ selected }} 
+                    </div>
+                {% endfor %}
+                </div>
+                <div class="request-date">
+                {% if item.request_info.date|length == 0%}
+                날짜상관없음
+                {% endif %}
+                {% for selected in item.request_info.date %}
+                    <div>
+                    {{ selected }} 
+                    </div>
+                {% endfor %}
+                </div>
+                <div class="request-age">
+                {{ item.min_age }}살 ~ {{ item.max_age }}살
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+        {% endif %}
+        </ul>
+        </span>
+
+        <span>
+        <h2>남자</h2>
+        <ul>
+        {% if man_requests|length == 0 %}
+        <li>대기 인원이 없습니다.<li>
+        {% else %}
+        {% for item in man_requests %}
+        <li>
+            <div class="profile-card man" data-id="{{item.index}}">
+                <div>
+                    <img class="img" src={{item.avata}} width=200 height=200/>
+                </div>
+                <div class="profile">
+                {{ item.nickname }} ({{ item.age }}, {{ item.belong }}
+                {% if item.department|length != 0 %}
+                {{ item.department }}
+                {% endif %}
+                )
+                </div>
+                <div class="request-personnel">
+                {% if item.request_info.personnel|length == 0%}
+                인원상관없음
+                {% endif %}
+                {% for selected in item.request_info.personnel %}
+                    <div>
+                    {{ selected }}
+                    </div>
+                {% endfor %}
+                </div>
+                <div class="request-date">
+                {% if item.request_info.date|length == 0%}
+                날짜상관없음
+                {% endif %}
+                {% for selected in item.request_info.date %}
+                    <div>
+                    {{ selected }}
+                    </div>
+                {% endfor %}
+                </div>
+                <div class="request-age">
+                {{ item.min_age }}살 ~ {{ item.max_age }}살
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+        {% endif %}
+        </ul>
+        </span>
+    </div>
+</div>
+
+<div class='right'>
+    <h1>
+    선택
+    </h1>   
+    <div class='matched'>
+        <div class="profile-card woman selected selected-disp" id="selected_woman">
+            <div class="selected-img-wrapper selected">
+                <img class="img" id="selected_woman_img" width=200 height=200/>
+            </div>
+            <div class="profile selected" id="selected_woman_profile">
+            </div>
+            <div class="request-personnel selected" id="selected_woman_request_personnel">
+            </div>
+            <div class="request-date selected" id="selected_woman_request_date">
+            </div>
+            <div class="request-age selected" id="selected_woman_request_age">
+            </div>
+        </div>
+        ------------------
+        <div class="profile-card man selected selected-disp" id="selected_man">
+            <div class="selected-img-wrapper selected">
+                <img class="img" id="selected_man_img" width=200 height=200/>
+            </div>
+            <div class="profile selected" id="selected_man_profile">
+            </div>
+            <div class="request-personnel selected" id="selected_man_request_personnel">
+            </div>
+            <div class="request-date selected" id="selected_man_request_date">
+            </div>
+            <div class="request-age selected" id="selected_man_request_age">
+            </div>
+        </div>
+    </div>
+    <form 
+    method="POST"
+    onsubmit="return validate(this)">
+        {%csrf_token%}
+        <input
+        type="hidden"
+        id="input_woman"
+        name="woman"
+        value=""
+        >
+        <input
+        type="hidden"
+        id="input_man"
+        name="man"
+        value="">
+        <input 
+            id="button_matching" 
+            type="submit" 
+            style='button' 
+            class='button-matching'
+            value="매칭">
+    </form>
+</div>
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+    const validate = (form) => {
+        let hard_validation = form.woman.value !== '' && form.man.value !== ''
+        let soft_validation = false;
+        if(!hard_validation) {
+            alert('선택을 완료해주세요');
+            return false;
+        }
+        else if(!soft_validation) {
+            return confirm('조건이 맞지 않습니다.\n그래도 미팅을 주선하시겠습니까?');
+        }
+        else {
+            return confirm('미팅을 주선하시겠습니까?');
+        }
+    }
+    const man_requests = {{ man_requests | safe }}
+    const woman_requests = {{ woman_requests | safe }}
+    let selected_man = null
+    let selected_woman = null
+    const profile_cards = document.querySelectorAll('.profile-card')
+    const button_matching = document.getElementById("button_matching");
+    button_matching.addEventListener('click', (event) => {
+
+    });
+    profile_cards.forEach((card) => {
+        card.addEventListener('click', (event) => {
+            if(event.currentTarget.getAttribute('class').includes(' man')) {
+                const other_cards = document.querySelectorAll('.profile-card.man');
+                
+                other_cards.forEach(other => {
+                    if(other.classList.contains('selected-disp')){
+                        return;
+                    }
+                    other.classList.remove('selected')
+                    let children = other.children;
+                    for(let i = 0; i < children.length; i++) {
+                        children[i].classList.remove('selected')
+                    }
+                })
+               if(event.currentTarget.getAttribute('class').includes(' selected-disp')) {
+                    selected_man = "";
+                    document.getElementById("input_man").value = selected_man;
+                    document.getElementById("selected_man_img").style.display = 'none';
+                    document.getElementById("selected_man_profile").innerHTML = '';
+                    document.getElementById("selected_man_request_personnel").innerHTML = '';
+                    document.getElementById("selected_man_request_date").innerHTML = '';
+                    document.getElementById("selected_man_request_age").innerHTML = '';
+                    man_requests.map(item => {
+                       item.selected = 'false';
+                    });
+                    return;
+               }
+               man_requests.map(item => {
+                    if(event.currentTarget.dataset.id == item.index) {
+                        if(item.selected == 'false') {
+                            selected_man = item.pk;
+                            document.getElementById("input_man").value = selected_man;
+                            event.currentTarget.classList.add('selected')
+                            let children = event.currentTarget.children;
+                            for(let i = 0; i < children.length; i++) {
+                                children[i].classList.add('selected')
+                            }
+                            document.getElementById("selected_man_img").style.display = 'block';
+                            document.getElementById("selected_man_img").src = item.avata
+                            document.getElementById("selected_man_profile").innerHTML = item.nickname + '(' + item.age + ', ' + item.belong + ')'
+                            if(item.request_info.personnel.length == 0) {
+                                document.getElementById("selected_man_request_personnel").innerHTML = '인원상관없음'
+                            }
+                            else {
+                                item.request_info.personnel.map(info => {
+                                    const div = document.createElement('div');
+                                    div.innerHTML = info;
+                                   document.getElementById("selected_man_request_personnel").appendChild(div);    
+                                })
+                            }
+                            if(item.request_info.date.length == 0) {
+                                document.getElementById("selected_man_request_date").innerHTML = '날짜상관없음'
+                            }
+                            else {
+                                item.request_info.date.map(info => {
+                                    const div = document.createElement('div');
+                                    div.innerHTML = info;
+                                    document.getElementById("selected_man_request_date").appendChild(div);
+                                })
+                            }
+                            document.getElementById("selected_man_request_age").innerHTML = item.min_age + '살 ~ ' + item.max_age + '살'
+                            item.selected = 'true'
+                        }
+                        else {
+                            event.currentTarget.classList.remove('selected')
+                            let children = event.currentTarget.children;
+                            for(let i = 0; i < children.length; i++) {
+                                children[i].classList.remove('selected')
+                            }
+                            selected_man = "";
+                            document.getElementById("input_man").value = selected_man;
+                            document.getElementById("selected_man_img").style.display = 'none';
+                            document.getElementById("selected_man_profile").innerHTML = '';
+                            document.getElementById("selected_man_request_personnel").innerHTML = '';
+                            document.getElementById("selected_man_request_date").innerHTML = '';
+                            document.getElementById("selected_man_request_age").innerHTML = '';
+                            item.selected = 'false'
+                        }
+                    }
+                    else {
+                        
+                        item.selected = 'false'
+                    }
+               })
+            }
+            else if(event.currentTarget.getAttribute('class').includes(' woman')) {
+                const other_cards = document.querySelectorAll('.profile-card.woman');
+                
+                other_cards.forEach(other => {
+                    if(other.classList.contains('selected-disp')){
+                        return;
+                    }
+                    other.classList.remove('selected')
+                    let children = other.children;
+                    for(let i = 0; i < children.length; i++) {
+                        children[i].classList.remove('selected')
+                    }
+                })
+                if(event.currentTarget.getAttribute('class').includes(' selected-disp')) {
+                    selected_woman = "";
+                    document.getElementById("input_woman").value = selected_woman;
+                    document.getElementById("selected_woman_img").style.display = 'none';
+                    document.getElementById("selected_woman_profile").innerHTML = '';
+                    document.getElementById("selected_woman_request_personnel").innerHTML = '';
+                    document.getElementById("selected_woman_request_date").innerHTML = '';
+                    document.getElementById("selected_woman_request_age").innerHTML = '';
+                    woman_requests.map(item => {
+                       item.selected = 'false';
+                    });
+                    return;
+               }
+                woman_requests.map(item => {
+                    if(event.currentTarget.dataset.id == item.index) {
+                        if(item.selected == 'false') {
+                            selected_woman = item.pk;
+                            document.getElementById("input_woman").value = selected_woman;
+                            event.currentTarget.classList.add('selected')
+                            let children = event.currentTarget.children;
+                            for(let i = 0; i < children.length; i++) {
+                                children[i].classList.add('selected')
+                            }
+                            document.getElementById("selected_woman_img").style.display = 'block';
+                            document.getElementById("selected_woman_img").src = item.avata
+                            document.getElementById("selected_woman_profile").innerHTML = item.nickname + '(' + item.age + ', ' + item.belong + ')'
+                            if(item.request_info.personnel.length == 0) {
+                                document.getElementById("selected_woman_request_personnel").innerHTML = '인원상관없음'
+                            }
+                            else {
+                                item.request_info.personnel.map(info => {
+                                    const div = document.createElement('div');
+                                    div.innerHTML = info;
+                                   document.getElementById("selected_woman_request_personnel").appendChild(div);    
+                                })
+                            }
+                            if(item.request_info.date.length == 0) {
+                                document.getElementById("selected_woman_request_date").innerHTML = '날짜상관없음'
+                            }
+                            else {
+                                item.request_info.date.map(info => {
+                                    const div = document.createElement('div');
+                                    div.innerHTML = info;
+                                    document.getElementById("selected_woman_request_date").appendChild(div);
+                                })
+                            }
+                            document.getElementById("selected_woman_request_age").innerHTML = item.min_age + '살 ~ ' + item.max_age + '살'
+                            item.selected = 'true'
+                        }
+                        else {
+                            event.currentTarget.classList.remove('selected')
+                            let children = event.currentTarget.children;
+                            for(let i = 0; i < children.length; i++) {
+                                children[i].classList.remove('selected')
+                            }
+                            selected_woman = "";
+                            document.getElementById("input_woman").value = selected_woman;
+                            document.getElementById("selected_woman_img").style.display = 'none';
+                            document.getElementById("selected_woman_profile").innerHTML = '';
+                            document.getElementById("selected_woman_request_personnel").innerHTML = '';
+                            document.getElementById("selected_woman_request_date").innerHTML = '';
+                            document.getElementById("selected_woman_request_age").innerHTML = '';
+                            item.selected = 'false' 
+                        }
+                    }
+                    else {
+                            item.selected = 'false' 
+                    }
+                })
+                
+            }
+        })
+    })
+</script>
+{% endblock %}
+</body>
+</html>

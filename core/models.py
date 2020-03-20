@@ -174,9 +174,11 @@ class Chat(models.Model):
             sender=self.sender, receiver=self.receiver)
         reverse = Chat.objects.filter(
             sender=self.receiver, receiver=self.sender)
-        if direct.exists() or reverse.exists():
+        if direct.exists():
             if(direct.last().id == self.id):
                 return
+            raise ValidationError('Aleady Exists')
+        elif reverse.exists():
             if(reverse.last().id == self.id):
                 return
             raise ValidationError('Aleady Exists')

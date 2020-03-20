@@ -1,3 +1,4 @@
+from django import template
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,7 +8,9 @@ from file_management.utils.file_helper import save_uploaded_file, rotate_image, 
 from authorization.models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.datastructures import MultiValueDictKeyError
+from django.shortcuts import render
 from rest_framework import generics
+from django.views.generic import ListView
 from drf_yasg.utils import swagger_auto_schema
 from .serializers import *
 from django.db import IntegrityError
@@ -851,3 +854,124 @@ class ToggleNotificationView(APIView):
             notification.chat = not notification.chat
         notification.save()
         return Response(status=status.HTTP_200_OK, data=result)
+
+
+def MatchRequestQueueView(request):
+    users = User.objects.all()
+    man_requests = []
+    woman_requests = []
+    DAY_STRING = ['월', '화', '수', '목', '금', '토', '일']
+    PERSONNEL_STRING = ['2:2', '3:3', '4:4']
+    DATE_STRING = ['', '', '', '', '', '', '', '금요일', '토요일']
+
+    today = datetime.datetime.today()
+    for i in range(1, 7):
+        the_day = today + datetime.timedelta(i)
+        DATE_STRING[i-1] = the_day.strftime(
+            '%m월%d일') + '({})'.format(DAY_STRING[the_day.weekday()])
+    man_count = 0
+    woman_count = 0
+    for user in users:
+        try:
+            if(user.match_request.all().count() > 0 and (user.match_request.last().status == MatchRequest.STATUS_CODE_MATCHING or user.match_request.last().status == MatchRequest.STATUS_CODE_MATCHING_YAMI)):
+                data = dict()
+                data['pk'] = user.match_request.last().id
+                data['selected'] = 'false'
+                data['nickname'] = user.nickname
+                data['belong'] = user.bv.belong
+                data['department'] = user.bv.department if user.bv.department != None else ''
+                data['min_age'] = user.match_request.last().min_age
+                data['max_age'] = user.match_request.last().max_age
+                data['age'] = datetime.datetime.today(
+                ).year - int(user.iv.birthdate[:4]) + 1
+                serializer = ImageSerializer(user.image.last().data)
+                data['avata'] = serializer.data['src']
+                personnel_int = user.match_request.last().personnel_selected
+                date_int = user.match_request.last().date_selected
+                requested_on = user.match_request.last().requested_on
+                personnel_selected = []
+                date_selected = []
+                if(personnel_int > 0):
+                    for i in range(0, 3):
+                        selected_per = ((personnel_int >> i) & 1) == 1
+                        if(selected_per):
+                            personnel_selected.append(PERSONNEL_STRING[i])
+                if(date_int > 0):
+                    selected_friday = (date_int & 128) >> 7 == 1
+                    selected_saturday = (date_int & 256) >> 8 == 1
+                    if(selected_friday):
+                        date_selected.append(DATE_STRING[7])
+                        date_int = date_int - 128
+                    if(selected_saturday):
+                        date_selected.append(DATE_STRING[8])
+                        date_int = date_int - 256
+                    day_diff = (today - requested_on).days
+                    if(day_diff > 0):
+                        date_int = date_int >> day_diff
+                    for i in range(0, 7):
+                        selected_day = ((date_int >> i) & 1) == 1
+                        if(selected_day):
+                            date_selected.append(DATE_STRING[i])
+                data['request_info'] = {
+                    'personnel': personnel_selected,
+                    'date': date_selected
+                }
+
+                if(user.iv.gender == 0):
+                    data['index'] = woman_count
+                    woman_requests.append(data)
+                    woman_count = woman_count + 1
+                elif(user.iv.gender == 1):
+                    data['index'] = man_count
+                    man_requests.append(data)
+                    man_count = man_count + 1
+        except Exception as e:
+            print(e)
+            pass
+    context = {
+        'man_requests': man_requests,
+        'woman_requests': woman_requests,
+    }
+    template_name = 'core/matchrequest_queue.html'
+
+    if request.method == "POST":
+        woman = MatchRequest.objects.get(id=request.POST['woman'])
+        man = MatchRequest.objects.get(id=request.POST['man'])
+        now = datetime.datetime.now()
+
+        woman.matched_with = man
+        woman.matched_on = now
+        woman.status = MatchRequest.STATUS_CODE_MATCHED
+
+        man.matched_with = woman
+        man.matched_on = now
+        man.status = MatchRequest.STATUS_CODE_MATCHED
+
+        man_user = man.user
+        woman_user = woman.user
+        push_data = {
+            'title': '야미구',
+            'content': '미팅 주선이 완료되었어요!',
+            'clickAction': {
+                'feed': True
+            },
+        }
+        data = {
+            'sender': man_user.id,
+            'receiver': woman_user.id,
+            'chat_type': 1,
+            'greet': '미팅 주선이 완료되었어요!'
+        }
+        serializer = ChatCreateSerializer(data=data)
+        if serializer.is_valid():
+            try:
+                serializer.save()
+            except ValidationError:
+                return render(request, template_name, context)
+            woman.save()
+            man.save()
+            firebase_message.send_push(man_user.id, push_data)
+            # firebase_message.send_push(woman_user.id, data)
+        else:
+            print(serializer.errors)
+    return render(request, template_name, context)

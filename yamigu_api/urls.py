@@ -9,6 +9,8 @@ from drf_yasg.views import get_schema_view
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from core.views import *
+from core.admin import admin_site
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -23,7 +25,8 @@ schema_view = get_schema_view(
     public=True,
 )
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin_site.urls),
+    path('admin2/', admin.site.urls),
     path('authorization/', include(auth_url_patterns)),
     path('core/', include(core_url_patterns)),
     path('deploy/', include(deploy_url_patterns)),
