@@ -999,11 +999,11 @@ def MatchRequestQueueView(request):
                 firebase_message.send_message(
                     [man_user, woman_user], chat.id, manager_message)
                 firebase_message.send_push(woman_user.id, push_data)
-                return HttpResponseRedirect(reverse('customadmin:admin-matching'))
             except ValidationError:
                 pass
         else:
             print(serializer.errors)
+        return HttpResponseRedirect(reverse('customadmin:admin-matching'))
     users = User.objects.all()
     man_requests = []
     woman_requests = []

@@ -193,7 +193,15 @@
         request_info_woman.date.length === 0) {
             return true;
         }
-        return false;
+        if(request_info_man.personnel.length !== 0 && request_info_woman.personnel.length !== 0) {
+            let difference = request_info_man.personnel.filter(x => request_info_woman.personnel.includes(x))
+            if(difference.length === 0) return false;
+        }
+        if(request_info_man.date.length !== 0 && request_info_woman.date.length !== 0) {
+            let difference = request_info_man.date.filter(x => request_info_woman.date.includes(x))
+            if(difference.length === 0) return false;
+        }
+        return true;
     }
     const validate = (form) => {
         let hard_validation = form.woman.value !== '' && form.man.value !== ''
