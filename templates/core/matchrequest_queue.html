@@ -178,9 +178,26 @@
 {% endblock %}
 {% block javascript %}
 <script type="text/javascript">
+    const _soft_validate = (form) => {
+        selected_man_obj = man_requests.find((item) => {
+            return item.selected;
+        })
+        selected_woman_obj = woman_requests.find((item) => {
+            return item.selected;
+        })
+        request_info_man = selected_man_obj.request_info;
+        request_info_woman = selected_woman_obj.request_info;
+        if(request_info_man.personnel.length === 0 && 
+        request_info_woman.personnel.length === 0 &&
+        request_info_man.date.length === 0 &&
+        request_info_woman.date.length === 0) {
+            return true;
+        }
+        return false;
+    }
     const validate = (form) => {
         let hard_validation = form.woman.value !== '' && form.man.value !== ''
-        let soft_validation = false;
+        let soft_validation = _soft_validate(form);
         if(!hard_validation) {
             alert('선택을 완료해주세요');
             return false;
@@ -198,9 +215,7 @@
     let selected_woman = null
     const profile_cards = document.querySelectorAll('.profile-card')
     const button_matching = document.getElementById("button_matching");
-    button_matching.addEventListener('click', (event) => {
 
-    });
     profile_cards.forEach((card) => {
         card.addEventListener('click', (event) => {
             if(event.currentTarget.getAttribute('class').includes(' man')) {

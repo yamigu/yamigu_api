@@ -945,10 +945,12 @@ def MatchRequestQueueView(request):
                 woman_belong = ''
                 man_belong = man_user.bv.belong
                 man_belong = man_belong + \
-                    (' ' + man_user.bv.department) if man_user.bv.department != None else ''
+                    ((' ' + man_user.bv.department)
+                     if man_user.bv.department != None else '')
                 woman_belong = woman_user.bv.belong
                 woman_belong = woman_belong + \
-                    (' ' + woman_user.bv.department) if woman_user.bv.department != None else ''
+                    ((' ' + woman_user.bv.department)
+                     if woman_user.bv.department != None else '')
                 man_age = datetime.datetime.today().year - \
                     int(man_user.iv.birthdate[:4]) + 1
                 woman_age = datetime.datetime.today().year - \
@@ -996,7 +998,7 @@ def MatchRequestQueueView(request):
                 firebase_message.send_push(man_user.id, push_data)
                 firebase_message.send_message(
                     [man_user, woman_user], chat.id, manager_message)
-                firebase_message.send_push(woman_user.id, data)
+                firebase_message.send_push(woman_user.id, push_data)
                 return HttpResponseRedirect(reverse('customadmin:admin-matching'))
             except ValidationError:
                 pass
