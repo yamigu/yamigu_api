@@ -968,7 +968,7 @@ def MatchRequestQueueView(request):
                     intersection = man_date_selected_set & woman_date_selected_set
                     selected_date_option = list(intersection)
                 selected_personnel_option_string = ''
-                selected_date_option = ''
+                selected_date_option_string = ''
                 for idx, option in enumerate(selected_personnel_option):
                     if idx > 0:
                         selected_personnel_option_string = selected_personnel_option_string + ', '
