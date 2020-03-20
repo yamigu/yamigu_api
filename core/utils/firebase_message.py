@@ -3,6 +3,7 @@ from firebase_admin import db
 from datetime import datetime
 from authorization.models import User
 import threading
+from django.conf import settings
 
 
 def send_push_thread(user_id, data, is_chat=False):
@@ -35,15 +36,18 @@ def send_push_thread(user_id, data, is_chat=False):
 
 
 def send_message(user_id, room_id, content):
-    ref = db.reference('user/{}/notifications'.format(uid))
+    user = User.objects.get(id=user_id)
+    ref = db.reference('message/{}'.format(room_id))
     key = ref.push().key
     ref.child(key).set({
-        'id': key,
-        'type': notification_type,
-        'content': content,
-        'data': data,
-        'isUnread': True,
+        'key': key,
+        'idSender': settings.MANAGER_UID,
+        'message': content,
         'time': int(((datetime.now() - datetime(1970, 1, 1)).total_seconds() - 3600 * 9) * 1000)
+    })
+    ref2 = db.reference('user/{}/chat/{}'.format(user.uid, room_id))
+    ref2.set({
+        'is_unread': True,
     })
 
 

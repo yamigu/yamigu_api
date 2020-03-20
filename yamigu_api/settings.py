@@ -209,3 +209,5 @@ FCM_DJANGO_SETTINGS = {
     # default: False
     "DELETE_INACTIVE_DEVICES": False,
 }
+
+MANAGER_UID = env("MANAGER_UID")
