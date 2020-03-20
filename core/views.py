@@ -857,7 +857,44 @@ class ToggleNotificationView(APIView):
         return Response(status=status.HTTP_200_OK, data=result)
 
 
+def selectOptions(mr):
+    DAY_STRING = ['월', '화', '수', '목', '금', '토', '일']
+    PERSONNEL_STRING = ['2:2', '3:3', '4:4']
+    DATE_STRING = ['', '', '', '', '', '', '', '금요일', '토요일']
+
+    personnel_int = mr.personnel_selected
+    date_int = mr.date_selected
+    requested_on = mr.requested_on
+    personnel_selected = []
+    date_selected = []
+    if(personnel_int > 0):
+        for i in range(0, 3):
+            selected_per = ((personnel_int >> i) & 1) == 1
+            if(selected_per):
+                personnel_selected.append(PERSONNEL_STRING[i])
+    if(date_int > 0):
+        selected_friday = (date_int & 128) >> 7 == 1
+        selected_saturday = (date_int & 256) >> 8 == 1
+        if(selected_friday):
+            date_selected.append(DATE_STRING[7])
+            date_int = date_int - 128
+        if(selected_saturday):
+            date_selected.append(DATE_STRING[8])
+            date_int = date_int - 256
+        day_diff = (today - requested_on).days
+        if(day_diff > 0):
+            date_int = date_int >> day_diff
+        for i in range(0, 7):
+            selected_day = ((date_int >> i) & 1) == 1
+            if(selected_day):
+                date_selected.append(DATE_STRING[i])
+    return personnel_selected, date_selected
+
+
 def MatchRequestQueueView(request):
+    DAY_STRING = ['월', '화', '수', '목', '금', '토', '일']
+    PERSONNEL_STRING = ['2:2', '3:3', '4:4']
+    DATE_STRING = ['', '', '', '', '', '', '', '금요일', '토요일']
     if request.method == "POST":
         woman = MatchRequest.objects.get(id=request.POST['woman'])
         man = MatchRequest.objects.get(id=request.POST['man'])
@@ -894,7 +931,58 @@ def MatchRequestQueueView(request):
                         'roomId': chat.id
                     },
                 }
-                manager_message = "안녕하세요 :) 미팅 주선이 완료되어 채팅방으로 연결되었어요!\n\n남: 연세대 24살\n여: 이화여대 전기전자공학부 22살\n- 2:2 미팅, 3:3 미팅\n- 날짜 상관 없음\n\n서로 매너있는 대화 부탁드려요!\n약속을 잡고 즐거운 미팅하시길 바래요! 감사합니다."
+                man_personnel_selected, man_date_selected = selectOptions(man)
+                woman_personnel_selected, woman_date_selected = selectOptions(
+                    woman)
+                man_belong = ''
+                woman_belong = ''
+                man_belong = man_user.bv.belong + \
+                    (' ' + man_user.bv.department) if man_user.bv.department != None else ''
+                woman_belong = woman_user.bv.belong + \
+                    (' ' + woman_user.bv.department) if woman_user.bv.department != None else ''
+                man_age = datetime.datetime.today().year - \
+                    int(man_user.iv.birthdate[:4]) + 1
+                woman_age = datetime.datetime.today().year - \
+                    int(woman_user.iv.birthdate[:4]) + 1
+                selected_personnel_option = []
+                selected_date_option = []
+                if(len(man_personnel_selected) == 0):  # 남자 인원 상관없음
+                    selected_personnel_option = woman_personnel_selected
+                elif(len(woman_personnel_selected) == 0):  # 여자 인원 상관없음
+                    selected_personnel_option = man_personnel_selected
+                else:
+                    man_personnel_selected_set = set(man_personnel_selected)
+                    woman_personnel_selected_set = set(
+                        woman_personnel_selected)
+                    intersection = man_personnel_selected_set & woman_personnel_selected_set
+                    selected_personnel_option = list(intersection)
+
+                if(len(man_date_selected) == 0):  # 남자 인원 상관없음
+                    selected_date_option = woman_date_selected
+                elif(len(woman_date_selected) == 0):  # 여자 인원 상관없음
+                    selected_date_option = man_date_selected
+                else:
+                    man_date_selected_set = set(man_date_selected)
+                    woman_date_selected_set = set(
+                        woman_date_selected)
+                    intersection = man_date_selected_set & woman_date_selected_set
+                    selected_date_option = list(intersection)
+                selected_personnel_option_string = ''
+                selected_date_option = ''
+                for idx, option in enumerate(selected_personnel_option):
+                    if idx > 0:
+                        selected_personnel_option_string = selected_personnel_option_string + ', '
+                    selected_personnel_option_string = selected_personnel_option_string + option
+                for idx, option in enumerate(selected_date_option):
+                    if idx > 0:
+                        selected_date_option_string = selected_date_option_string + ', '
+                    selected_date_option_string = selected_date_option_string + option
+                if(len(selected_personnel_option)):
+                    selected_personnel_option_string = "날짜 상관 없음"
+                if(len(selected_date_option)):
+                    selected_date_option_string = "인원 상관 없음"
+                manager_message = "안녕하세요 :) 미팅 주선이 완료되어 채팅방으로 연결되었어요!\n\n남: {} {}살\n여: {} {}살\n- {}\n- {}\n\n서로 매너있는 대화 부탁드려요!\n약속을 잡고 즐거운 미팅하시길 바래요! 감사합니다.".format(
+                    man_belong, man_age, woman_belong, woman_age, selected_personnel_option_string, selected_date_option_string)
                 firebase_message.send_push(man_user.id, push_data)
                 firebase_message.send_message(
                     [man_user, woman_user], chat.id, manager_message)
@@ -906,9 +994,6 @@ def MatchRequestQueueView(request):
     users = User.objects.all()
     man_requests = []
     woman_requests = []
-    DAY_STRING = ['월', '화', '수', '목', '금', '토', '일']
-    PERSONNEL_STRING = ['2:2', '3:3', '4:4']
-    DATE_STRING = ['', '', '', '', '', '', '', '금요일', '토요일']
 
     today = datetime.datetime.today()
     for i in range(1, 7):
