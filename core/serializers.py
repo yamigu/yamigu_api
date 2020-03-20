@@ -166,8 +166,8 @@ class ChatCreateSerializer(ModelSerializer):
         model = Chat
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'declined_on',
-                            'canceled_on', 'approved_on')
-        optional_fields = ('chat_type', )
+                            'canceled_on')
+        optional_fields = ('chat_type', 'approved_on')
 
 
 class ChatSerializer(ModelSerializer):

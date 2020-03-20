@@ -857,6 +857,47 @@ class ToggleNotificationView(APIView):
 
 
 def MatchRequestQueueView(request):
+    if request.method == "POST":
+        woman = MatchRequest.objects.get(id=request.POST['woman'])
+        man = MatchRequest.objects.get(id=request.POST['man'])
+        now = datetime.datetime.now()
+
+        woman.matched_with = man
+        woman.matched_on = now
+        woman.status = MatchRequest.STATUS_CODE_MATCHED
+
+        man.matched_with = woman
+        man.matched_on = now
+        man.status = MatchRequest.STATUS_CODE_MATCHED
+
+        man_user = man.user
+        woman_user = woman.user
+        push_data = {
+            'title': '야미구',
+            'content': '미팅 주선이 완료되었어요!',
+            'clickAction': {
+                'feed': True
+            },
+        }
+        data = {
+            'sender': man_user.id,
+            'receiver': woman_user.id,
+            'chat_type': 1,
+            'approved_on': now,
+            'greet': '미팅 주선이 완료되었어요!'
+        }
+        serializer = ChatCreateSerializer(data=data)
+        if serializer.is_valid():
+            try:
+                serializer.save()
+                woman.save()
+                man.save()
+                firebase_message.send_push(man_user.id, push_data)
+                # firebase_message.send_push(woman_user.id, data)
+            except ValidationError:
+                pass
+        else:
+            print(serializer.errors)
     users = User.objects.all()
     man_requests = []
     woman_requests = []
@@ -934,44 +975,4 @@ def MatchRequestQueueView(request):
     }
     template_name = 'core/matchrequest_queue.html'
 
-    if request.method == "POST":
-        woman = MatchRequest.objects.get(id=request.POST['woman'])
-        man = MatchRequest.objects.get(id=request.POST['man'])
-        now = datetime.datetime.now()
-
-        woman.matched_with = man
-        woman.matched_on = now
-        woman.status = MatchRequest.STATUS_CODE_MATCHED
-
-        man.matched_with = woman
-        man.matched_on = now
-        man.status = MatchRequest.STATUS_CODE_MATCHED
-
-        man_user = man.user
-        woman_user = woman.user
-        push_data = {
-            'title': '야미구',
-            'content': '미팅 주선이 완료되었어요!',
-            'clickAction': {
-                'feed': True
-            },
-        }
-        data = {
-            'sender': man_user.id,
-            'receiver': woman_user.id,
-            'chat_type': 1,
-            'greet': '미팅 주선이 완료되었어요!'
-        }
-        serializer = ChatCreateSerializer(data=data)
-        if serializer.is_valid():
-            try:
-                serializer.save()
-            except ValidationError:
-                return render(request, template_name, context)
-            woman.save()
-            man.save()
-            firebase_message.send_push(man_user.id, push_data)
-            # firebase_message.send_push(woman_user.id, data)
-        else:
-            print(serializer.errors)
     return render(request, template_name, context)
