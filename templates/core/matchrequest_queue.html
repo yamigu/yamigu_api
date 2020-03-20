@@ -269,6 +269,7 @@
                                 document.getElementById("selected_man_request_personnel").innerHTML = '인원상관없음'
                             }
                             else {
+                                document.getElementById("selected_man_request_personnel").innerHTML = '';
                                 item.request_info.personnel.map(info => {
                                     const div = document.createElement('div');
                                     div.innerHTML = info;
@@ -279,6 +280,7 @@
                                 document.getElementById("selected_man_request_date").innerHTML = '날짜상관없음'
                             }
                             else {
+                                document.getElementById("selected_man_request_date").innerHTML = '';
                                 item.request_info.date.map(info => {
                                     const div = document.createElement('div');
                                     div.innerHTML = info;
@@ -353,6 +355,7 @@
                                 document.getElementById("selected_woman_request_personnel").innerHTML = '인원상관없음'
                             }
                             else {
+                                document.getElementById("selected_woman_request_personnel").innerHTML = '';
                                 item.request_info.personnel.map(info => {
                                     const div = document.createElement('div');
                                     div.innerHTML = info;
@@ -363,6 +366,7 @@
                                 document.getElementById("selected_woman_request_date").innerHTML = '날짜상관없음'
                             }
                             else {
+                                document.getElementById("selected_woman_request_date").innerHTML = '';
                                 item.request_info.date.map(info => {
                                     const div = document.createElement('div');
                                     div.innerHTML = info;
