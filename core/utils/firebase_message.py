@@ -35,7 +35,7 @@ def send_push_thread(user_id, data, is_chat=False):
     #             data=data, title=data['title'], body=data['content'], badge=badge)
 
 
-def send_message(user_id, room_id, content):
+def send_message_thread(user_id, room_id, content):
     user = User.objects.get(id=user_id)
     ref = db.reference('message/{}'.format(room_id))
     key = ref.push().key
