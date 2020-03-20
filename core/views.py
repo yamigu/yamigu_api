@@ -997,7 +997,6 @@ def MatchRequestQueueView(request):
                 firebase_message.send_message(
                     [man_user, woman_user], chat.id, manager_message)
                 firebase_message.send_push(woman_user.id, data)
-                chat.delete()
                 return HttpResponseRedirect(reverse('customadmin:admin-matching'))
             except ValidationError:
                 pass
