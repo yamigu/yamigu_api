@@ -31,4 +31,7 @@ urlpatterns = [
          CertificateAcceptAdminView.as_view()),
     path('manager/certificate/user/decline/',
          CertificateDeclineAdminView.as_view()),
+    path('migrate/', MigrateView.as_view()),
+    path('migrate_bv/<uid>/', MigrateBVView.as_view()),
+    path('migrate_avata/<uid>/', MigrateAvataView.as_view()),
 ]

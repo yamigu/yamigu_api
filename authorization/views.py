@@ -124,6 +124,102 @@ class SignupView(APIView):
         return Response(status=status.HTTP_201_CREATED, data='successfully created')
 
 
+class MigrateView(APIView):
+    def post(self, request, *args, **kwargs):
+        # 유저 존재 여부 판단
+        user, is_follow = User.objects.get_or_create(uid=request.data['uid'])
+        if not is_follow:
+            return Response(status=status.HTTP_200_OK, data='aleady exists')
+        # 회원가입
+        user.username = request.data['username']
+        user.nickname = request.data['nickname']
+        user.location = Location.objects.get(code=1)
+        user.num_of_yami = 10
+        user.save()
+
+        # 본인인증
+        iv_data = {
+            'user': user.id,
+            'realname': request.data['name'],
+            'birthdate': request.data['birthdate'],
+            'gender': request.data['gender'],
+            'phoneno': request.data['mobileno'],
+        }
+        try:
+            iv = IdentityVerification.objects.get(
+                phoneno=request.data['mobileno'])
+            serializer = IdentityVerificationSerializer(iv, data=iv_data)
+            if serializer.is_valid():
+                serializer.save()
+        except ObjectDoesNotExist:
+            serializer = IdentityVerificationSerializer(data=iv_data)
+            if serializer.is_valid():
+                serializer.save()
+
+        # 소속인증
+        bv = BelongVerification(user=user, belong=request.data['belong'], department=request.data[
+                                'department'], is_student=True if request.data['is_student'] == 'true' else False)
+        bv.save()
+
+        return Response(status=status.HTTP_201_CREATED, data='successfully created')
+
+
+class MigrateBVView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid=kwargs.get('uid'))
+
+        # 소속인증
+        bv = user.bv
+
+        BV_TAG = "BV"
+        file_name = save_uploaded_file(request.data['bv_image'], BV_TAG)
+        image = Image(
+            src=BV_TAG + "/" + file_name
+        )
+        image.save()
+        bv_image = BVImage(
+            bv=bv,
+            data=image
+        )
+
+        bv_image.checked_on = datetime.now()
+        bv_image.is_checked = True
+        bv_image.save()
+        rotate_image(get_file_path(file_name, BV_TAG))
+        return Response(status=status.HTTP_201_CREATED, data='successfully created')
+
+
+class MigrateAvataView(APIView):
+    def post(self, request, *args, **kwargs):
+        user = User.objects.get(uid=kwargs.get('uid'))
+
+        # 프로필 사진
+        number = 1
+        PROFILE_TAG = "Profile"
+        file_name = save_uploaded_file(request.data['p_image'], PROFILE_TAG)
+        image = Image(
+            src=PROFILE_TAG + "/" + file_name
+        )
+        image.save()
+        profile_image = ProfileImage(user=user, data=image, number=number)
+        profile_image.save()
+        serializer = ImageSerializer(image)
+
+        # 피드 등록
+        before = None
+        feed = Feed(
+            user=user,
+            before=before
+        )
+        feed.save()
+        feed_image = FeedImage(
+            feed=feed,
+            data=image
+        )
+        feed_image.save()
+        return Response(status=status.HTTP_201_CREATED, data='successfully created')
+
+
 class ProfileImageView(APIView):
     """
         마이 프로필 사진

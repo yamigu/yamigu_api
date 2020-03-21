@@ -91,9 +91,6 @@ class ProfileImage(models.Model):
     number = models.SmallIntegerField(default=0)
     updated_on = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return self.user.nickname + '\'s {}'.format(self.number)
-
 
 class BelongVerification(models.Model):
     user = models.OneToOneField(
