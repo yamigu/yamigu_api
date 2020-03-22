@@ -140,13 +140,15 @@ class FeedListView(generics.ListAPIView):
         if shields.count() > 0:
             for shield in shields:
                 users = users.exclude(iv__phoneno=shield.phoneno)
-        serializer = FeedListSerializer(
-            users, many=True, context={'user': user})
         DEFAULT_PAGE = 0
         page_num = int(self.request.GET.get('page', DEFAULT_PAGE))
-        data = serializer.data
         if(page_num == 0):
-            data = random.sample(data, len(data))
+            users = users.order_by('?')
+        serializer = FeedListSerializer(
+            users, many=True, context={'user': user})
+
+        data = serializer.data
+
         page = self.paginate_queryset(data)
         return self.get_paginated_response(page)
 
