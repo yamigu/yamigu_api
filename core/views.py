@@ -118,14 +118,17 @@ class FeedListView(generics.ListAPIView):
     @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
         RANDOM_EXPERIENCES = 5
-        user = request.user
+        DEFAULT_PAGE = 0
 
+        user = request.user
+        page_num = int(self.request.GET.get('page', DEFAULT_PAGE))
         if not request.session.get('random_exp'):
             request.session['random_exp'] = random.randrange(
                 0, RANDOM_EXPERIENCES)
         object_list = cache.get('random_exp_%d' %
                                 request.session['random_exp'])
-        if object_list:
+        if object_list and page_num != 0:
+            print('has session & next page')
             serializer = FeedListSerializer(
                 object_list, many=True, context={'user': user})
 
@@ -156,10 +159,7 @@ class FeedListView(generics.ListAPIView):
             if shields.count() > 0:
                 for shield in shields:
                     users = users.exclude(iv__phoneno=shield.phoneno)
-            # DEFAULT_PAGE = 0
-            # page_num = int(self.request.GET.get('page', DEFAULT_PAGE))
-            # if(page_num == 0):
-            #     users = users.order_by('?')
+
             users = users.order_by('?')
             object_list = list(users)
             cache.set('random_exp_%d' %
