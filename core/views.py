@@ -22,6 +22,7 @@ from .utils import firebase_message
 from .pagination import SmallPagesPagination
 import json
 import random
+from django.core.cache import cache
 
 
 class MatchRequestView(APIView):
@@ -116,41 +117,61 @@ class FeedListView(generics.ListAPIView):
 
     @swagger_auto_schema(responses={200: FeedListSerializer()})
     def get(self, request, *args, **kwargs):
+        RANDOM_EXPERIENCES = 5
         user = request.user
-        users = User.objects.all().exclude(id=user.id)  # exclude me
-        users = users.exclude(is_staff=True)  # exclude manager
-        users = users.exclude(nickname__isnull=True)  # exclude no Nickname
-        users = users.exclude(iv__isnull=True)  # exclude no IV
 
-        something_id = []
-        blocked_id = []
-        nofeeds_id = []
-        for something in user.something_with.all():
-            something_id.append(something.id)
-        for blocked in user.disconnected_with.all():
-            blocked_id.append(blocked.id)
-        for obj in users:
-            if(obj.feed.all().count() == 0):
-                nofeeds_id.append(obj.id)
-        users = users.exclude(id__in=something_id)
-        users = users.exclude(id__in=blocked_id)
-        users = users.exclude(id__in=nofeeds_id)
-        shields = user.shield.all()
+        if not request.session.get('random_exp'):
+            request.session['random_exp'] = random.randrange(
+                0, RANDOM_EXPERIENCES)
+        object_list = cache.get('random_exp_%d' %
+                                request.session['random_exp'])
+        if object_list:
+            serializer = FeedListSerializer(
+                object_list, many=True, context={'user': user})
 
-        if shields.count() > 0:
-            for shield in shields:
-                users = users.exclude(iv__phoneno=shield.phoneno)
-        DEFAULT_PAGE = 0
-        page_num = int(self.request.GET.get('page', DEFAULT_PAGE))
-        if(page_num == 0):
+            data = serializer.data
+            page = self.paginate_queryset(data)
+            return self.get_paginated_response(page)
+        else:
+            users = User.objects.all().exclude(id=user.id)  # exclude me
+            users = users.exclude(is_staff=True)  # exclude manager
+            users = users.exclude(nickname__isnull=True)  # exclude no Nickname
+            users = users.exclude(iv__isnull=True)  # exclude no IV
+
+            something_id = []
+            blocked_id = []
+            nofeeds_id = []
+            for something in user.something_with.all():
+                something_id.append(something.id)
+            for blocked in user.disconnected_with.all():
+                blocked_id.append(blocked.id)
+            for obj in users:
+                if(obj.feed.all().count() == 0):
+                    nofeeds_id.append(obj.id)
+            users = users.exclude(id__in=something_id)
+            users = users.exclude(id__in=blocked_id)
+            users = users.exclude(id__in=nofeeds_id)
+            shields = user.shield.all()
+
+            if shields.count() > 0:
+                for shield in shields:
+                    users = users.exclude(iv__phoneno=shield.phoneno)
+            # DEFAULT_PAGE = 0
+            # page_num = int(self.request.GET.get('page', DEFAULT_PAGE))
+            # if(page_num == 0):
+            #     users = users.order_by('?')
             users = users.order_by('?')
-        serializer = FeedListSerializer(
-            users, many=True, context={'user': user})
+            object_list = list(users)
+            cache.set('random_exp_%d' %
+                      request.session['random_exp'], object_list, 100)
 
-        data = serializer.data
+            serializer = FeedListSerializer(
+                users, many=True, context={'user': user})
 
-        page = self.paginate_queryset(data)
-        return self.get_paginated_response(page)
+            data = serializer.data
+            page = self.paginate_queryset(data)
+
+            return self.get_paginated_response(page)
 
 
 class FeedView(APIView):
