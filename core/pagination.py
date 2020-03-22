@@ -16,5 +16,5 @@ class SmallPagesPagination(PageNumberPagination):
             'total': self.page.paginator.count,
             'page': int(self.request.GET.get('page', DEFAULT_PAGE)),
             'page_size': int(self.request.GET.get('page_size', self.page_size)),
-            'results': random.sample(data, len(data))
+            'results': data,
         })

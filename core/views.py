@@ -21,6 +21,7 @@ from fcm_django.models import FCMDevice
 from .utils import firebase_message
 from .pagination import SmallPagesPagination
 import json
+import random
 
 
 class MatchRequestView(APIView):
@@ -141,7 +142,12 @@ class FeedListView(generics.ListAPIView):
                 users = users.exclude(iv__phoneno=shield.phoneno)
         serializer = FeedListSerializer(
             users, many=True, context={'user': user})
-        page = self.paginate_queryset(serializer.data)
+        DEFAULT_PAGE = 0
+        page_num = int(self.request.GET.get('page', DEFAULT_PAGE))
+        data = serializer.data
+        if(page_num == 0):
+            data = random.sample(data, len(data))
+        page = self.paginate_queryset(data)
         return self.get_paginated_response(page)
 
 
