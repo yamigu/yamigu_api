@@ -1107,7 +1107,8 @@ def MatchRequestQueueView(request):
 
     return render(request, template_name, context)
 
-def GiveFreeTicketView(APIView):
+
+class GiveFreeTicketView(APIView):
     def post(self, request, *args, **kwargs):
         users = User.objects.all()
         for user in users:
