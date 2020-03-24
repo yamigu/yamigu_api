@@ -1106,3 +1106,11 @@ def MatchRequestQueueView(request):
     template_name = 'core/matchrequest_queue.html'
 
     return render(request, template_name, context)
+
+def GiveFreeTicketView(APIView):
+    def post(self, request, *args, **kwargs):
+        users = User.objects.all()
+        for user in users:
+            user.num_of_free = 2
+            user.save()
+        return Response(status=status.HTTP_200_OK)
