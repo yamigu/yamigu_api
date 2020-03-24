@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
+from fcm_django.models import FCMDevice
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from allauth.socialaccount.providers.kakao.views import KakaoOAuth2Adapter
@@ -130,7 +131,7 @@ class MigrateView(APIView):
         user, is_follow = User.objects.get_or_create(uid=request.data['uid'])
         if not is_follow:
             return Response(status=status.HTTP_200_OK, data='aleady exists')
-        # 회원가입
+        # 회원가입ㅁ
         user.username = request.data['username']
         user.nickname = request.data['nickname']
         user.location = Location.objects.get(code=1)
@@ -497,7 +498,10 @@ class LogoutView(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         user.auth_token.delete()
+        fcm_devices = FCMDevice.objects.filter(user=user.id)
         user.save()
+        for fcm_device in fcm_devices:
+            fcm_device.delete()
         return Response(status=status.HTTP_200_OK, data="successfully requested")
 
 
