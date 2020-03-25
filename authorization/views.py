@@ -105,6 +105,7 @@ class SignupView(APIView):
         user = request.user
         user.nickname = request.data['nickname']
         user.location = Location.objects.get(name=request.data['location'])
+        user.num_of_free = 2
         user.save()
         try:
             user.bv.is_student = True if request.data['is_student'] == 'true' else False
