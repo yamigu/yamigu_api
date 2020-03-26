@@ -349,7 +349,7 @@
                                 children[i].classList.add('selected')
                             }
                             document.getElementById("selected_woman_img").style.display = 'block';
-                            document.getElementById("selected_woman_img").src = item.avata
+                            document.getElementById("selected_woman_img").src = item.avata !== null ? item.avata : '#'
                             document.getElementById("selected_woman_profile").innerHTML = item.nickname + '(' + item.age + ', ' + item.belong + ')'
                             if(item.request_info.personnel.length == 0) {
                                 document.getElementById("selected_woman_request_personnel").innerHTML = '인원상관없음'

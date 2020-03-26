@@ -1055,8 +1055,11 @@ def MatchRequestQueueView(request):
                 data['max_age'] = user.match_request.last().max_age
                 data['age'] = datetime.datetime.today(
                 ).year - int(user.iv.birthdate[:4]) + 1
-                serializer = ImageSerializer(user.image.last().data)
-                data['avata'] = serializer.data['src']
+                if(user.image.all().count() > 0):
+                    serializer = ImageSerializer(user.image.last().data)
+                    data['avata'] = serializer.data['src']
+                else:
+                    data['avata'] = 'https://daepo.pe.kr/media/user-default-profile.png'
                 personnel_int = user.match_request.last().personnel_selected
                 date_int = user.match_request.last().date_selected
                 requested_on = user.match_request.last().requested_on
