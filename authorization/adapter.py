@@ -26,7 +26,7 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
         social_app_name = sociallogin.account.provider.upper()
         user = None
         if(social_app_name == 'KAKAO'):
-            user = User.objects.get(uid=sociallogin.account.extra_data['uid'])
+            user = User.objects.get(uid=sociallogin.account.extra_data['id'])
         elif(social_app_name == 'APPLE'):
             user = User.objects.get(
                 uid=str(sociallogin.account.extra_data['sub']).replace('.', ''))
@@ -34,4 +34,4 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
             perform_login(request, user, email_verification='optional')
     except User.DoesNotExist:
         user = User.objects.get(id=request.user.id)
-        sociallogin.connect(request, user)`
+        sociallogin.connect(request, user)
