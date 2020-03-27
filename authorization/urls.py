@@ -6,6 +6,7 @@ from .views import *
 
 
 urlpatterns = [
+    path('accounts/', include('allauth.urls'), name='socialaccount_signup'),
     path('oauth/kakao/', KakaoLoginView.as_view()),
     path('oauth/apple/', AppleLoginView.as_view()),
     path('withdraw/', WithdrawView.as_view()),
