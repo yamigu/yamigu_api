@@ -26,6 +26,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             elif(social_app_name == 'APPLE'):
                 user = User.objects.get(
                     uid=str(sociallogin.account.extra_data['sub']).replace('.', ''))
+            if user:
                 sociallogin.connect(request, user)
             # if user:
             #     perform_login(request, user, email_verification='optional')
