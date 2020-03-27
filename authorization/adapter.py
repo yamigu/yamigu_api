@@ -2,6 +2,7 @@ from .models import User
 
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.utils import perform_login
+from django.dispatch import receiver
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
