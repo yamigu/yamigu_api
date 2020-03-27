@@ -20,19 +20,19 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):
         pass
 
-
-@receiver(pre_social_login)
-def link_to_local_user(sender, request, sociallogin, **kwargs):
-    try:
-        social_app_name = sociallogin.account.provider.upper()
-        user = None
-        if(social_app_name == 'KAKAO'):
-            user = User.objects.get(uid=sociallogin.account.extra_data['id'])
-        elif(social_app_name == 'APPLE'):
-            user = User.objects.get(
-                uid=str(sociallogin.account.extra_data['sub']).replace('.', ''))
-        if user:
-            perform_login(request, user, email_verification='optional')
-    except User.DoesNotExist:
-        user = User.objects.get(id=request.user.id)
-        sociallogin.connect(request, user)
+    @receiver(pre_social_login)
+    def link_to_local_user(sender, request, sociallogin, **kwargs):
+        try:
+            social_app_name = sociallogin.account.provider.upper()
+            user = None
+            if(social_app_name == 'KAKAO'):
+                user = User.objects.get(
+                    uid=sociallogin.account.extra_data['id'])
+            elif(social_app_name == 'APPLE'):
+                user = User.objects.get(
+                    uid=str(sociallogin.account.extra_data['sub']).replace('.', ''))
+            if user:
+                perform_login(request, user, email_verification='optional')
+        except User.DoesNotExist:
+            user = User.objects.get(id=request.user.id)
+            sociallogin.connect(request, user)
