@@ -2,7 +2,6 @@ from .models import User
 
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.utils import perform_login
-from django.dispatch import receiver
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
@@ -18,10 +17,6 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
                 user_pk=user.pk, extra_data=sociallogin.account.extra_data)
 
     def pre_social_login(self, request, sociallogin):
-        pass
-
-    @receiver(pre_social_login)
-    def link_to_local_user(sender, request, sociallogin, **kwargs):
         try:
             social_app_name = sociallogin.account.provider.upper()
             user = None
