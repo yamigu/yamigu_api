@@ -27,7 +27,10 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
                 user = User.objects.get(
                     uid=str(sociallogin.account.extra_data['sub']).replace('.', ''))
             if user:
-                sociallogin.connect(request, user)
+                try:
+                    sociallogin.connect(request, user)
+                except:
+                    pass
             # if user:
             #     perform_login(request, user, email_verification='optional')
         except User.DoesNotExist:
