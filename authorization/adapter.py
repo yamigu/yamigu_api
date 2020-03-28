@@ -34,5 +34,4 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             # if user:
             #     perform_login(request, user, email_verification='optional')
         except User.DoesNotExist:
-            user = User.objects.get(id=request.user.id)
-            sociallogin.connect(request, user)
+            pass
