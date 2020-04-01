@@ -136,11 +136,15 @@ class UserAdmin(admin.ModelAdmin):
                 print(e)
         elif "certificate_decline" in request.POST:
             try:
-                bv_image = obj.bv.image.last()
-                bv_image.is_checked = False
-                bv_image.is_declined = True
-                bv_image.declined_on = datetime.datetime.now()
-                bv_image.save()
+                # bv_image = obj.bv.image.last()
+                # bv_image.is_checked = False
+                # bv_image.is_declined = True
+                # bv_image.declined_on = datetime.datetime.now()
+                # bv_image.save()
+                if hasattr(obj, 'bv') and hasattr(obj.bv, 'image'):
+                    bv_images = obj.bv.image.all()
+                    for bv_image in bv_images:
+                        bv_image.delete()
                 data = {'user': obj.id}
                 res = requests.post(
                     "https://daepo.pe.kr/authorization/manager/certificate/user/decline/", data=data)
