@@ -152,15 +152,14 @@ class FeedListView(generics.ListAPIView):
                 if(obj.feed.all().count() == 0):
                     nofeeds_id.append(obj.id)
                 obj_shields = obj.shield.all()
-                if hasattr(user, 'iv') and hasattr(user, 'bv'):
-                    if(obj_shields.count() > 0):
-                        for shield in obj_shields:
-                            if(shield.phoneno == user.iv.phoneno):
-                                blocked_id.append(obj.id)
-                                break
-                            elif(shield.belong in user.bv.belong):
-                                blocked_id.append(obj.id)
-                                break
+                if(obj_shields.count() > 0):
+                    for shield in obj_shields:
+                        if(hasattr(user, 'iv') and shield.phoneno == user.iv.phoneno):
+                            blocked_id.append(obj.id)
+                            break
+                        elif(hasattr(user, 'bv') and shield.belong in user.bv.belong):
+                            blocked_id.append(obj.id)
+                            break
             users = users.exclude(id__in=something_id)
             users = users.exclude(id__in=blocked_id)
             users = users.exclude(id__in=nofeeds_id)
