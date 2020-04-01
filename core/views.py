@@ -162,7 +162,7 @@ class FeedListView(generics.ListAPIView):
                         users = users.exclude(iv__phoneno=shield.phoneno)
                     elif(shield.belong != None):
                         users = users.exclude(
-                            iv__belong__icontains=shield.belonng)
+                            iv__belong__icontains=shield.belong)
 
             users = users.order_by('?')
             object_list = list(users)
