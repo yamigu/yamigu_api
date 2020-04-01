@@ -137,6 +137,7 @@ class UserAdmin(admin.ModelAdmin):
         elif "certificate_decline" in request.POST:
             try:
                 bv_image = obj.bv.image.last()
+                bv_image.is_checked = False
                 bv_image.is_declined = True
                 bv_image.declined_on = datetime.datetime.now()
                 bv_image.save()
