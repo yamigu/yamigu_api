@@ -158,7 +158,11 @@ class FeedListView(generics.ListAPIView):
 
             if shields.count() > 0:
                 for shield in shields:
-                    users = users.exclude(iv__phoneno=shield.phoneno)
+                    if(shield.phoneno != None):
+                        users = users.exclude(iv__phoneno=shield.phoneno)
+                    elif(shield.belong != None):
+                        users = users.exclude(
+                            iv__belong__icontains=shield.belonng)
 
             users = users.order_by('?')
             object_list = list(users)
