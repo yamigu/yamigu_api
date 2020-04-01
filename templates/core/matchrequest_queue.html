@@ -10,6 +10,7 @@
 <body>
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
 {% block content %}
+<iframe id="myiframe" name="myiframe" src="" style="display:none"></iframe>
 <div class="container">
 
 <div class="left-wrapper">
@@ -178,6 +179,12 @@
 {% endblock %}
 {% block javascript %}
 <script type="text/javascript">
+    const iFrame = document.getElementById("myiframe");
+
+    iFrame.onload = function () {
+        /** do smth with your iframe data */
+        console.log(iFrame.contentDocument.body.innerHTML);
+    };
     const _soft_validate = (form) => {
         selected_man_obj = man_requests.find((item) => {
             return item.selected;

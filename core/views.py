@@ -78,12 +78,12 @@ class MatchRequestView(APIView):
             user.save()
             manager = User.objects.get(uid=settings.MANAGER_UID)
             push_data = {
-                    'title': '야미구',
-                    'content': '미팅 주선 신청이 들어왔어요!({})'.format(user.nickname),
-                    'clickAction': {
-                        'home': True,
-                    },
-                }
+                'title': '야미구',
+                'content': '미팅 주선 신청이 들어왔어요!({})'.format(user.nickname),
+                'clickAction': {
+                    'home': True,
+                },
+            }
             firebase_message.send_push(manager.id, push_data)
             return Response(status=status.HTTP_201_CREATED, data=rdata)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
@@ -167,7 +167,7 @@ class FeedListView(generics.ListAPIView):
                         if(hasattr(user, 'iv') and shield.phoneno == user.iv.phoneno):
                             blocked_id.append(obj.id)
                             break
-                        elif(hasattr(user, 'bv') and shield.belong in user.bv.belong):
+                        elif(hasattr(user, 'bv') and shield.belong != '' and shield.belong in user.bv.belong):
                             blocked_id.append(obj.id)
                             break
             users = users.exclude(id__in=something_id)
@@ -446,7 +446,7 @@ class LikeView(APIView):
 
 class LikeCancelView(APIView):
     """
-        좋아요 취소
+        좋아요 취증
 
         ---
     """
@@ -958,7 +958,21 @@ def MatchRequestQueueView(request):
         woman = MatchRequest.objects.get(id=request.POST['woman'])
         man = MatchRequest.objects.get(id=request.POST['man'])
         now = datetime.datetime.now()
-
+        if hasattr(woman.user, 'shield'):
+            shields = woman.user.shield.all()
+            for shield in shields:
+                if(hasattr(man.user, 'iv') and shield.phoneno == man.user.iv.phoneno):
+                    return render(request, 'core/error.html', {'message': "{}님이 {}님의 핸드폰 번호를 차단했어요({})".format(woman.user.nickname, man.user.nickname, shield.phoneno)})
+                elif(hasattr(man.user, 'bv') and shield.belong != '' and shield.belong in man.user.bv.belong):
+                    return render(request, 'core/error.html', {'message': "{}님이 {}님의 소속을 차단했어요({})".format(woman.user.nickname, man.user.nickname, shield.belong)})
+        if hasattr(man.user, 'shield'):
+            shields = man.user.shield.all()
+            for shield in shields:
+                print(shield)
+                if(hasattr(woman.user, 'iv') and shield.phoneno == woman.user.iv.phoneno):
+                    return render(request, 'core/error.html', {'message': "{}님이 {}님의 핸드폰 번호를 차단했어요".format(man.user.nickname, woman.user.nickname)})
+                elif(hasattr(woman.user, 'bv') and shield.belong != '' and shield.belong in woman.user.bv.belong):
+                    return render(request, 'core/error.html', {'message': "{}님이 {}님의 소속을 차단했어요({})".format(man.user.nickname, woman.user.nickname, shield.belong)})
         woman.matched_with = man
         woman.matched_on = now
         woman.status = MatchRequest.STATUS_CODE_MATCHED
@@ -1051,8 +1065,8 @@ def MatchRequestQueueView(request):
                 firebase_message.send_message(
                     [man_user, woman_user], chat.id, manager_message)
                 firebase_message.send_push(woman_user.id, push_data)
-            except ValidationError:
-                pass
+            except ValidationError as e:
+                return render(request, 'core/error.html', {'message': str(e)})
         else:
             print(serializer.errors)
         return HttpResponseRedirect(reverse('customadmin:admin-matching'))
