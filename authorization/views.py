@@ -18,6 +18,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 from drf_yasg.utils import swagger_auto_schema
 from core.utils import firebase_message
+from django.conf import settings
 
 import firebase_admin
 from firebase_admin import auth
@@ -340,6 +341,15 @@ class BelongVerificationView(APIView):
             serializer = BelongVerificationSerializer(user.bv, data=data)
             if serializer.is_valid():
                 serializer.save()
+                manager = User.objects.get(uid=settings.MANAGER_UID)
+                push_data = {
+                    'title': '야미구',
+                    'content': '소속 인증 요청이 들어왔어요!({})'.format(user.nickname),
+                    'clickAction': {
+                        'home': True,
+                    },
+                }
+                firebase_message.send_push(manager.id, push_data)
                 return Response(status=status.HTTP_200_OK, data="successfully uploaded")
             return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
         else:
@@ -366,6 +376,15 @@ class BelongVerificationView(APIView):
                 data=image
             )
             bv_image.save()
+            manager = User.objects.get(uid=settings.MANAGER_UID)
+            push_data = {
+                'title': '야미구',
+                'content': '소속 인증 요청이 들어왔어요!({})'.format(user.nickname),
+                'clickAction': {
+                    'home': True,
+                },
+            }
+            firebase_message.send_push(manager.id, push_data)
             return Response(status=status.HTTP_200_OK, data="successfully uploaded")
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

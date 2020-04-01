@@ -23,6 +23,7 @@ from .pagination import SmallPagesPagination
 import json
 import random
 from django.core.cache import cache
+from django.conf import settings
 
 
 class MatchRequestView(APIView):
@@ -75,6 +76,15 @@ class MatchRequestView(APIView):
         if serializer.is_valid():
             serializer.save()
             user.save()
+            manager = User.objects.get(uid=settings.MANAGER_UID)
+            push_data = {
+                    'title': '야미구',
+                    'content': '미팅 주선 신청이 들어왔어요!({})'.format(user.nickname),
+                    'clickAction': {
+                        'home': True,
+                    },
+                }
+            firebase_message.send_push(manager.id, push_data)
             return Response(status=status.HTTP_201_CREATED, data=rdata)
         return Response(status=status.HTTP_400_BAD_REQUEST, data=serializer.errors)
 
