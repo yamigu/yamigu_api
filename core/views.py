@@ -994,14 +994,15 @@ def MatchRequestQueueView(request):
         serializer = ChatCreateSerializer(data=data)
         if serializer.is_valid():
             try:
-                chat = serializer.save()
-                woman.save()
-                man.save()
+                # chat = serializer.save()
+                # woman.save()
+                # man.save()
                 push_data = {
                     'title': '야미구',
                     'content': '미팅 주선이 완료되었어요!',
                     'clickAction': {
-                        'roomId': chat.id
+                        # 'roomId': chat.id
+                        'roomId': 'asdasdasd'
                     },
                 }
                 man_personnel_selected, man_date_selected = selectOptions(man)
@@ -1043,20 +1044,24 @@ def MatchRequestQueueView(request):
                         if('(금)' in man_date):
                             for woman_date in woman_date_selected:
                                 if(woman_date == '금요일'):
-                                    woman_date.append(man_date)
+                                    woman_date_selected.append(man_date)
+                                    break
                         if('(토)' in man_date):
                             for woman_date in woman_date_selected:
                                 if(woman_date == '토요일'):
-                                    woman_date.append(man_date)
+                                    woman_date_selected.append(man_date)
+                                    break
                     for woman_date in woman_date_selected:
                         if('(금)' in woman_date):
                             for man_date in man_date_selected:
                                 if(man_date == '금요일'):
-                                    man_date.append(woman_date)
+                                    man_date_selected.append(woman_date)
+                                    break
                         if('(토)' in woman_date):
                             for man_date in man_date_selected:
                                 if(man_date == '토요일'):
-                                    man_date.append(woman_date)
+                                    man_date_selected.append(woman_date)
+                                    break
                     man_date_selected_set = set(man_date_selected)
                     woman_date_selected_set = set(
                         woman_date_selected)
@@ -1079,10 +1084,11 @@ def MatchRequestQueueView(request):
                     selected_date_option_string = "날짜 상관 없음"
                 manager_message = "안녕하세요 :) 미팅 주선이 완료되어 채팅방으로 연결되었어요!\n\n남: {} {}살\n여: {} {}살\n- {}\n- {}\n\n서로 매너있는 대화 부탁드려요!\n약속을 잡고 즐거운 미팅하시길 바래요! 감사합니다.".format(
                     man_belong, man_age, woman_belong, woman_age, selected_personnel_option_string, selected_date_option_string)
-                firebase_message.send_push(man_user.id, push_data)
-                firebase_message.send_message(
-                    [man_user, woman_user], chat.id, manager_message)
-                firebase_message.send_push(woman_user.id, push_data)
+                print(manager_message)
+                # firebase_message.send_push(man_user.id, push_data)
+                # firebase_message.send_message(
+                #     [man_user, woman_user], chat.id, manager_message)
+                # firebase_message.send_push(woman_user.id, push_data)
             except ValidationError as e:
                 if('Aleady Exists' in str(e)):
                     return render(request, 'core/error.html', {'message': '해당 유저들은 이미 채팅을 진행한 내역이 있습니다.'})
