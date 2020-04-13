@@ -1039,6 +1039,24 @@ def MatchRequestQueueView(request):
                 elif(len(woman_date_selected) == 0):  # 여자 날짜 상관없음
                     selected_date_option = man_date_selected
                 else:
+                    for man_date in man_date_selected:
+                        if('(금)' in man_date):
+                            for woman_date in woman_date_selected:
+                                if(woman_date == '금요일'):
+                                    woman_date.append(man_date)
+                        if('(토)' in man_date):
+                            for woman_date in woman_date_selected:
+                                if(woman_date == '토요일'):
+                                    woman_date.append(man_date)
+                    for woman_date in woman_date_selected:
+                        if('(금)' in woman_date):
+                            for man_date in man_date_selected:
+                                if(man_date == '금요일'):
+                                    man_date.append(woman_date)
+                        if('(토)' in woman_date):
+                            for man_date in man_date_selected:
+                                if(man_date == '토요일'):
+                                    man_date.append(woman_date)
                     man_date_selected_set = set(man_date_selected)
                     woman_date_selected_set = set(
                         woman_date_selected)
@@ -1066,6 +1084,10 @@ def MatchRequestQueueView(request):
                     [man_user, woman_user], chat.id, manager_message)
                 firebase_message.send_push(woman_user.id, push_data)
             except ValidationError as e:
+                if('Aleady Exists' in str(e)):
+                    return render(request, 'core/error.html', {'message': '해당 유저들은 이미 채팅을 진행한 내역이 있습니다.'})
+                return render(request, 'core/error.html', {'message': str(e)})
+            except Exception as e:
                 return render(request, 'core/error.html', {'message': str(e)})
         else:
             print(serializer.errors)
