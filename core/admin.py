@@ -11,6 +11,8 @@ class CustomAdminSite(admin.AdminSite):
         custom_urls = [
             path('core/meetings/',
                  self.admin_view(MatchRequestQueueView), name="admin-matching"),
+            path('core/push_notification/',
+                 self.admin_view(PushNotificationView), name="admin-push"),
         ]
         return urls + custom_urls
 

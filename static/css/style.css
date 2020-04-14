@@ -102,3 +102,38 @@ ul {
 .button-matching:hover {
   opacity: 0.6;
 }
+
+.right .input {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.right .input .input-text {
+  display: block;
+  width: 70%;
+  font-size: 22px;
+  margin: 20;
+}
+
+.button-sending {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ff8826;
+  color: white;
+  width: 80px;
+  height: 40px;
+  font-size: 15px;
+  transition: 0.3s;
+  border-radius: 10px;
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+
+.button-sending:hover {
+  opacity: 0.6;
+}

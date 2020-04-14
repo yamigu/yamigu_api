@@ -1,0 +1,144 @@
+{% load static %}
+{% load match_extras %} 
+{% load i18n %}
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+<title>야미구 푸시 알림 공지</title>
+</head>
+<body>
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+{% block content %}
+<iframe id="myiframe" name="myiframe" src="" style="display:none"></iframe>
+<div class="container">
+    <div class="left-wrapper">
+        <div class="left-header">     
+            <h1>
+            푸시 알림 공지
+            </h1>
+        </div>
+        <div class="left">
+            <span>
+                <h2>여자</h2>
+                <ul>
+                <button id="check_all_woman">전체 선택</button>
+                {% for user in woman_list %}
+                    <li>
+                        <div class="box">
+                            <input id={{user.id}} type="checkbox" class="woman-check">
+                            <label for={{user.id}}>{{ user.nickname }}</label>
+                        </div>
+                    <li>
+                {% endfor %}
+                </ul>
+            </span>
+            <span>
+                <h2>남자</h2>
+                <ul>
+                <button id="check_all_man">전체 선택</button>
+                {% for user in man_list %}
+                    <li>
+                        <div class="box">
+                            <input id={{user.id}} type="checkbox" class="man-check">
+                            <label for={{user.id}}>{{ user.nickname }}</label>
+                        </div>
+                    <li>
+                {% endfor %}
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="right">
+        <h2>알림 메시지 작성</h2>
+        <form 
+        method="POST"
+        onsubmit="return validate(this)"
+        class="input">
+            {%csrf_token%}
+            <input type="text" id="input" class="input-text" placeholder="" name="message">
+            <input
+                type="hidden"
+                id="input_user_list"
+                name="user_list"
+                value=""
+                >
+            <input 
+                id="button_sending" 
+                type="submit" 
+                style='button' 
+                class='button-sending'
+                value="전송">
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+    const iFrame = document.getElementById("myiframe");
+
+    iFrame.onload = function () {
+        /** do smth with your iframe data */
+        console.log(iFrame.contentDocument.body.innerHTML);
+    };
+    const validate = (form) => {
+        let input_user_list = "";
+        document.getElementById("input_user_list").value = "";
+        const man_boxes = Array.from(document.getElementsByClassName('man-check'));
+        const woman_boxes = Array.from(document.getElementsByClassName('woman-check'));
+        man_boxes.forEach((box) => {
+            if(box.checked){
+                if(input_user_list != "") {
+                    input_user_list += ', '
+                }
+                input_user_list += box.id
+            }
+        })
+        woman_boxes.forEach((box) => {
+            if(box.checked){
+                if(input_user_list != "") {
+                    input_user_list += ', '
+                }
+                input_user_list += box.id
+            }
+        })
+        document.getElementById("input_user_list").value = input_user_list;
+        let text_validation = form.text.value !== '';
+        let user_validation = input_user_list !== '';
+        if(!text_validation) {
+            alert('메시지를 작성해주세요');
+            return false;
+        }
+        else if(!user_validation) {
+            alert('유저를 선택해주세요');
+            return false;
+        }
+        else {
+            return confirm('메시지를 전송하시겠습니까?');
+        }
+    }
+    const check_all_man = document.getElementById("check_all_man");
+    const check_all_woman = document.getElementById("check_all_woman");
+
+    var checked_all_man = false;
+    var checked_all_woman = false;
+    check_all_man.addEventListener('click', (event) => {
+        checked_all_man = !checked_all_man;
+        const boxes = Array.from(document.getElementsByClassName('man-check'));
+        
+        boxes.forEach((box) => {
+            box.checked = checked_all_man;
+        })
+    })
+    check_all_woman.addEventListener('click', (event) => {
+        checked_all_woman = !checked_all_woman;
+        const boxes = Array.from(document.getElementsByClassName('woman-check'));
+        
+        boxes.forEach((box) => {
+            box.checked = checked_all_woman;
+        })
+    })
+</script>
+{% endblock %}
+</body>
+</html>

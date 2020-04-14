@@ -1174,6 +1174,30 @@ def MatchRequestQueueView(request):
     return render(request, template_name, context)
 
 
+def PushNotificationView(request):
+    if request.method == 'POST':
+        user_list = request.POST['user_list'].split(', ')
+        message = request.POST['message']
+        push_data = {
+                    'title': '야미구',
+                    'content': message,
+                    'clickAction': {
+                        'home': True,
+                    },
+                }
+        for user_id in user_list:
+            firebase_message.send_push(user_id, push_data)
+        return HttpResponseRedirect(reverse('customadmin:admin-push'))
+    woman_list = User.objects.all().filter(iv__gender=0)
+    man_list = User.objects.all().filter(iv__gender=1)
+    template_name = 'core/send_push.html'
+    context = {
+        'man_list': man_list,
+        'woman_list': woman_list,
+    }
+    return render(request, template_name, context)
+
+
 class GiveFreeTicketView(APIView):
     def post(self, request, *args, **kwargs):
         users = User.objects.all()
